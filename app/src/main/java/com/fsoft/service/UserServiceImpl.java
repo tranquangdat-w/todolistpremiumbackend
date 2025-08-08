@@ -1,10 +1,13 @@
 package com.fsoft.service;
 
 import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fsoft.exceptions.ApiException;
 import com.fsoft.exceptions.RegistrationException;
 import com.fsoft.model.User;
 import com.fsoft.repository.UserRepository;
@@ -24,7 +27,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Map<String, String> registration(RegistrationRequest registrationRequest) {
+  public User registration(RegistrationRequest registrationRequest) {
     this.validateNewUserInfo(registrationRequest);
 
     final User user = User.builder()
@@ -32,13 +35,12 @@ public class UserServiceImpl implements UserService {
         .name(registrationRequest.getName())
         .email(registrationRequest.getEmail())
         .password(passwordEncoder.encode(registrationRequest.getPassword()))
+        .verifyToken(UUID.randomUUID())
         .build();
-
-    System.out.println(user);
 
     userRepository.save(user);
 
-    return Map.of("message", "registration successfully");
+    return user;
   }
 
   private void validateNewUserInfo(RegistrationRequest registrationRequest) {
@@ -49,15 +51,15 @@ public class UserServiceImpl implements UserService {
         .existsByUsername(registrationRequest.getUsername());
 
     if (existsUserByUsername) {
-      throw new RegistrationException(
-          String.format("Username '%s' is exists", registrationRequest.getUsername()));
+      throw new ApiException(
+          String.format("Username '%s' is exists", registrationRequest.getUsername()),
+          HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     if (existsUserByEmail) {
-      throw new RegistrationException(
-          String.format("Email '%s' is exists", registrationRequest.getEmail()));
+      throw new ApiException(
+          String.format("Email '%s' is exists", registrationRequest.getEmail()),
+          HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
-
   }
-
 }

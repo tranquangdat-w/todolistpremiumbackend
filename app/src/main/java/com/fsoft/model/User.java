@@ -26,7 +26,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Table(name = "users")
 public class User {
-
   @Id
   @GeneratedValue
   private UUID id;
@@ -55,4 +54,7 @@ public class User {
   @Column(name = "is_active")
   @NotNull
   private boolean isActive;
+
+  @Column(name = "verify_token")
+  private UUID verifyToken;
 }

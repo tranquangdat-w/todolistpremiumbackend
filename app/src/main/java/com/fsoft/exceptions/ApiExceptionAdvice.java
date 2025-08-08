@@ -16,14 +16,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ApiExceptionAdvice {
 
-  @ExceptionHandler({ RegistrationException.class })
-  ResponseEntity<ApiExceptionResponse> handleRegistrationException(RegistrationException exception) {
+  @ExceptionHandler({ ApiException.class })
+  ResponseEntity<ApiExceptionResponse> handleRegistrationException(ApiException exception) {
     final ApiExceptionResponse errorResponse = ApiExceptionResponse.builder()
-        .status(HttpStatus.BAD_REQUEST)
         .message(exception.getMessage())
         .build();
 
-    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    return ResponseEntity.status(exception.getStatusCode()).body(errorResponse);
   }
 
   @ExceptionHandler({ MethodArgumentNotValidException.class })
@@ -34,25 +33,23 @@ public class ApiExceptionAdvice {
     final List<String> errorList = fieldErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage)
         .collect(Collectors.toList());
 
-    System.out.println("what the fuck---------=-0=-0=0-");
     final ApiExceptionResponse validationErrorResponse = ApiExceptionResponse.builder()
-        .status(HttpStatus.BAD_REQUEST)
         .message(String.join(", ", errorList))
+        .stackTrace(getStackTraceAsString(exception))
         .build();
 
-    return ResponseEntity.status(validationErrorResponse.getStatus()).body(validationErrorResponse);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationErrorResponse);
   }
 
   // Nếu exception không được bắt thì mặc định là lỗi của server
   @ExceptionHandler(Exception.class)
   ResponseEntity<ApiExceptionResponse> handleRegistrationException(Exception exception) {
     final ApiExceptionResponse commonError = ApiExceptionResponse.builder()
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .message(exception.getMessage())
         .stackTrace(getStackTraceAsString(exception))
         .build();
 
-    return ResponseEntity.status(commonError.getStatus()).body(commonError);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(commonError);
   }
 
   private String getStackTraceAsString(Throwable throwable) {

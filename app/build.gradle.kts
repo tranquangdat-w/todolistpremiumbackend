@@ -31,6 +31,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.auth0:java-jwt:4.5.0")
   implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+  implementation("com.resend:resend-java:3.1.0")
 
 
 
