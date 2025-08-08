@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fsoft.security.dto.RegistrationRequest;
-import com.fsoft.security.service.UserService;
+import com.fsoft.dto.RegistrationRequest;
+import com.fsoft.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.fsoft.security.service;
+package com.fsoft.service;
 
 import java.util.Map;
 
