@@ -2,12 +2,13 @@ package com.fsoft.service;
 
 import java.util.Map;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fsoft.exceptions.RegistrationException;
 import com.fsoft.model.User;
 import com.fsoft.repository.UserRepository;
-import com.fsoft.security.dto.RegistrationRequest;
+import com.fsoft.dto.RegistrationRequest;
 
 import lombok.AllArgsConstructor;
 
@@ -15,6 +16,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public User findOneByUserName(String username) {
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
         .username(registrationRequest.getUsername())
         .name(registrationRequest.getName())
         .email(registrationRequest.getEmail())
+        .password(passwordEncoder.encode(registrationRequest.getPassword()))
         .build();
 
     System.out.println(user);

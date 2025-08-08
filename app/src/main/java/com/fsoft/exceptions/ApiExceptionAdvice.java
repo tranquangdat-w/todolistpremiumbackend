@@ -34,6 +34,7 @@ public class ApiExceptionAdvice {
     final List<String> errorList = fieldErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage)
         .collect(Collectors.toList());
 
+    System.out.println("what the fuck---------=-0=-0=0-");
     final ApiExceptionResponse validationErrorResponse = ApiExceptionResponse.builder()
         .status(HttpStatus.BAD_REQUEST)
         .message(String.join(", ", errorList))

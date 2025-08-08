@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,21 +32,27 @@ public class User {
   private UUID id;
 
   @Column(name = "name")
+  @NotNull
   private String name;
 
   @Column(name = "user_name", unique = true)
+  @NotNull
   private String username;
 
   @Column(name = "password")
+  @NotNull
   private String password;
 
   @Column(name = "email")
+  @NotNull
   private String email;
 
-  @Column(name = "role")
+  @Builder.Default
   @Enumerated(EnumType.STRING)
-  private UserRole userRole;
+  @Column(name = "role", nullable = false)
+  private UserRole userRole = UserRole.CLIENT;
 
   @Column(name = "is_active")
+  @NotNull
   private boolean isActive;
 }
