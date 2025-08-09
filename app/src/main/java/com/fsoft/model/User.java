@@ -55,4 +55,7 @@ public class User {
 
   @Column(name = "verify_token")
   private UUID verifyToken;
+
+  @Column(name = "avatar")
+  private String avatar;
 }

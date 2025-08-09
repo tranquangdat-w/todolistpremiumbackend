@@ -65,7 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     String accessToken = cookie.getValue();
-    System.out.println(accessToken);
 
     // Kiem tra access token
     try {

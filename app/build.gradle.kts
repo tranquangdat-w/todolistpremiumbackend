@@ -29,11 +29,15 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+
   implementation("com.auth0:java-jwt:4.5.0")
+
   implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+
   implementation("com.resend:resend-java:3.1.0")
 
-
+  implementation("org.mapstruct:mapstruct:1.6.3")
+  annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
