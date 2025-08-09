@@ -1,16 +1,22 @@
 package com.fsoft.service;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fsoft.dto.UserDto;
 import com.fsoft.exceptions.ApiException;
 import com.fsoft.model.User;
+import com.fsoft.model.UserRole;
 import com.fsoft.repository.UserRepository;
+import com.fsoft.security.jwt.JwtProperties;
+import com.fsoft.security.jwt.JwtTokenManager;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -20,6 +26,8 @@ import lombok.AllArgsConstructor;
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final JwtProperties jwtProperties;
+  private final JwtTokenManager jwtTokenManager;
 
   @Override
   public User findOneByUserName(String username) {
@@ -118,6 +126,12 @@ public class UserServiceImpl implements UserService {
           HttpStatus.BAD_REQUEST.value());
     }
 
+    if (!exitsUser.isActive()) {
+      throw new ApiException(
+          String.format("Your account has not been activated, please check your mail"),
+          HttpStatus.BAD_REQUEST.value());
+    }
+
     if (!passwordEncoder.matches(password, exitsUser.getPassword())) {
       throw new ApiException(
           String.format("Password is incorrect"),
@@ -129,6 +143,52 @@ public class UserServiceImpl implements UserService {
         .email(exitsUser.getEmail())
         .userRole(exitsUser.getUserRole())
         .name(exitsUser.getName())
+        .username(exitsUser.getUsername())
+        .isActive(exitsUser.isActive())
         .build();
+  }
+
+  @Override
+  public ResponseCookie refreshToken(String refreshToken) {
+    if (refreshToken == null) {
+      throw new ApiException("Please login again", HttpStatus.UNAUTHORIZED.value());
+    }
+
+    try {
+      DecodedJWT decodedJWT = jwtTokenManager.validateToken(
+          refreshToken,
+          jwtProperties.getRefreshTokenSecretKey());
+
+      System.out.println(decodedJWT.getClaim("id").asString());
+      UserDto user = UserDto.builder()
+          .id(UUID.fromString(decodedJWT.getClaim("id").asString()))
+          .name(decodedJWT.getClaim("name").asString())
+          .username(decodedJWT.getClaim("username").asString())
+          .email(decodedJWT.getClaim("email").asString())
+          .userRole(UserRole.valueOf(decodedJWT.getClaim("userRole").asString()))
+          .isActive(decodedJWT.getClaim("isActive").asBoolean())
+          .build();
+
+      String accessToken = jwtTokenManager.generateToken(
+          user,
+          jwtProperties.getAccessTokenExpirationMinute(),
+          jwtProperties.getAccessTokenSecretKey(),
+          jwtProperties.getIssuer());
+
+      ResponseCookie accessTokenRes = ResponseCookie
+          .from("accessToken", accessToken)
+          .httpOnly(true)
+          .secure(true)
+          .maxAge(Duration.ofDays(14))
+          .sameSite("none")
+          .build();
+
+      return accessTokenRes;
+
+    } catch (Exception exception) {
+      System.out.println(exception);
+      exception.printStackTrace();
+      throw new ApiException("Please login again", HttpStatus.UNAUTHORIZED.value());
+    }
   }
 }

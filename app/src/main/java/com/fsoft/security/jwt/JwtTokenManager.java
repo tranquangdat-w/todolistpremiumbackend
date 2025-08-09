@@ -9,21 +9,21 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fsoft.dto.UserDto;
-import com.fsoft.model.UserRole;
 
 @Component
 public class JwtTokenManager {
-  public String genrateToken(UserDto user, long timeToExpire, String secretKey, String issuer) {
-    final String username = user.getUsername();
-    final UserRole userRole = user.getUserRole();
 
+  public String generateToken(UserDto user, long timeToExpire, String secretKey, String issuer) {
     return JWT.create()
         .withIssuer(issuer)
-        .withClaim("role", userRole.name())
-        .withClaim("username", username)
         .withIssuedAt(new Date())
         .withExpiresAt(new Date(System.currentTimeMillis() + timeToExpire * 60 * 1000))
-        .withIssuer(secretKey)
+        .withClaim("id", user.getId().toString())
+        .withClaim("name", user.getName())
+        .withClaim("username", user.getUsername())
+        .withClaim("email", user.getEmail())
+        .withClaim("userRole", user.getUserRole().name())
+        .withClaim("isActive", user.isActive())
         .sign(Algorithm.HMAC256(secretKey));
   }
 

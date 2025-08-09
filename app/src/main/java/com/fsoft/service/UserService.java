@@ -5,6 +5,8 @@ import com.fsoft.model.User;
 
 import java.util.Map;
 
+import org.springframework.http.ResponseCookie;
+
 public interface UserService {
   User findOneByUserName(String username);
 
@@ -18,4 +20,6 @@ public interface UserService {
   Map<String, String> verifyAccount(String username, String token);
 
   UserDto loginUser(String email, String password);
+
+  ResponseCookie refreshToken(String refreshToken);
 }

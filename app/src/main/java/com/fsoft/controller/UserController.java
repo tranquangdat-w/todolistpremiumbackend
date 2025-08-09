@@ -7,7 +7,9 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,13 +76,13 @@ public class UserController {
         loginRequestDto.getEmail(),
         loginRequestDto.getPassword());
 
-    String accessToken = jwtTokenManager.genrateToken(
+    String accessToken = jwtTokenManager.generateToken(
         user,
         jwtProperties.getAccessTokenExpirationMinute(),
         jwtProperties.getAccessTokenSecretKey(),
         jwtProperties.getIssuer());
 
-    String refreshToken = jwtTokenManager.genrateToken(
+    String refreshToken = jwtTokenManager.generateToken(
         user,
         jwtProperties.getRefreshTokenExpirationMinute(),
         jwtProperties.getRefreshTokenSecretKey(),
@@ -126,5 +128,22 @@ public class UserController {
         .header(HttpHeaders.SET_COOKIE, accessTokenRes.toString())
         .header(HttpHeaders.SET_COOKIE, refreshTokenRes.toString())
         .body(Map.of("message", "logout user successfully"));
+  }
+
+  @GetMapping("/refresh_token")
+  public ResponseEntity<Map<String, String>> refresh_token(
+      @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+
+    ResponseCookie accessTokenRes = userService.refreshToken(refreshToken);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HttpHeaders.SET_COOKIE, accessTokenRes.toString())
+        .body(Map.of("message", "refresh token successfully"));
+  }
+
+  @GetMapping("/hello")
+  public ResponseEntity<Map<String, String>> hello() {
+    return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Hello"));
   }
 }

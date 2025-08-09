@@ -6,12 +6,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.fsoft.security.jwt.JwtAuthenticationFilter;
+
+import lombok.AllArgsConstructor;
 
 @Configuration
+@AllArgsConstructor
 public class SecurityConfiguration {
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
+        .cors(cors -> {
+        })
         .csrf(CsrfConfigurer::disable)
         .authorizeHttpRequests(
             // Allow some endpoint
@@ -24,7 +34,8 @@ public class SecurityConfiguration {
         // Using JWT insted of session management
         .sessionManagement(
             manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        // .exceptionHandling(handler -> handler.authenticationEntryPoint())
+        // Using jwt not using this from spring security
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
 }
