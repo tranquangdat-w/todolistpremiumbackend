@@ -29,5 +29,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.getPassword(),
         authorities);
   }
-
 }

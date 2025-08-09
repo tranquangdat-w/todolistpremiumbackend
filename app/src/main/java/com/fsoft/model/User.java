@@ -15,35 +15,33 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @Builder
-@Entity
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Table(name = "users")
 public class User {
   @Id
   @GeneratedValue
   private UUID id;
 
-  @Column(name = "name")
   @NotNull
+  @Column(name = "name")
   private String name;
 
-  @Column(name = "user_name", unique = true)
   @NotNull
+  @Column(name = "user_name", unique = true)
   private String username;
 
-  @Column(name = "password")
   @NotNull
+  @Column(name = "password")
   private String password;
 
-  @Column(name = "email")
   @NotNull
+  @Column(name = "email")
   private String email;
 
   @Builder.Default
@@ -51,8 +49,8 @@ public class User {
   @Column(name = "role", nullable = false)
   private UserRole userRole = UserRole.CLIENT;
 
-  @Column(name = "is_active")
   @NotNull
+  @Column(name = "is_active")
   private boolean isActive;
 
   @Column(name = "verify_token")

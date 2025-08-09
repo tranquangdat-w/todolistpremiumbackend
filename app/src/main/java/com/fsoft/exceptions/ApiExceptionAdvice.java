@@ -42,15 +42,17 @@ public class ApiExceptionAdvice {
   }
 
   // Nếu exception không được bắt thì mặc định là lỗi của server
-  @ExceptionHandler(Exception.class)
-  ResponseEntity<ApiExceptionResponse> handleRegistrationException(Exception exception) {
-    final ApiExceptionResponse commonError = ApiExceptionResponse.builder()
-        .message(exception.getMessage())
-        .stackTrace(getStackTraceAsString(exception))
-        .build();
-
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(commonError);
-  }
+  // @ExceptionHandler(Exception.class)
+  // ResponseEntity<ApiExceptionResponse> handleRegistrationException(Exception
+  // exception) {
+  // final ApiExceptionResponse commonError = ApiExceptionResponse.builder()
+  // .message(exception.getMessage())
+  // .stackTrace(getStackTraceAsString(exception))
+  // .build();
+  //
+  // return
+  // ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(commonError);
+  // }
 
   private String getStackTraceAsString(Throwable throwable) {
     StringWriter sw = new StringWriter();

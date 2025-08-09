@@ -1,6 +1,5 @@
 package com.fsoft.service;
 
-import org.hibernate.validator.cfg.defs.pl.REGONDef;
 import org.springframework.stereotype.Service;
 
 import static com.fsoft.utils.Constrants.CONTENT_MAIL_VERIFY_ACCOUNT;
@@ -21,7 +20,7 @@ import lombok.Setter;
 @Service
 @AllArgsConstructor
 public class SendMailService {
-  private final ResendEmailProperties resendEmailProperties;
+  private ResendEmailProperties resendEmailProperties;
 
   public void sendVerifyAccountMail(
       final String receiver,

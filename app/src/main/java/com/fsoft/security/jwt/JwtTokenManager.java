@@ -8,15 +8,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fsoft.model.User;
+import com.fsoft.dto.UserDto;
 import com.fsoft.model.UserRole;
 
-import lombok.AllArgsConstructor;
-
 @Component
-@AllArgsConstructor
 public class JwtTokenManager {
-  public String genrateToken(User user, long timeToExpire, String secretKey, String issuer) {
+  public String genrateToken(UserDto user, long timeToExpire, String secretKey, String issuer) {
     final String username = user.getUsername();
     final UserRole userRole = user.getUserRole();
 
