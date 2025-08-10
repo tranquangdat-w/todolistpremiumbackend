@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop     # create: tạo mới; create-drop: tạo & xóa khi tắt app
+    show-sql: true              # Log SQL ra console
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 400103
+    driver-class-name: org.postgresql.Driver
+
+jwt:
+  accessTokenSecretKey: fsoftneovimarch-dsafkdjfa
+  refreshTokenSecretKey: fsoftneovimarch-dksjfaks
+  issuer: www.tranquandat.com
+  accessTokenExpirationMinute: 1
+  refreshTokenExpirationMinute: 10
+
+
+resend:
+  RESEND_API_KEY:
+  EMAIL_SENDER: onboarding@resend.dev

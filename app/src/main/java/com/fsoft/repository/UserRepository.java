@@ -7,14 +7,19 @@ import org.springframework.data.repository.query.Param;
 
 import com.fsoft.model.User;
 
+import java.util.UUID;
+
 public interface UserRepository extends JpaRepository<User, String> {
   User findByUsername(String username);
 
   User findByEmail(String email);
 
+  User findById(UUID id);
+
   boolean existsByEmail(String email);
 
   boolean existsByUsername(String username);
+  
 
   @Modifying
   @Query("UPDATE User u " +
