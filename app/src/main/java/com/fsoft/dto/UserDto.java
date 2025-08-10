@@ -9,10 +9,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@Getter
 @Setter
+@Getter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
@@ -21,6 +23,7 @@ public class UserDto {
   private String username;
   private String email;
   private UserRole userRole;
-  private boolean isActive;
+  private boolean active;
   private String avatar;
+
 }

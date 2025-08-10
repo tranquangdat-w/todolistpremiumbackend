@@ -36,8 +36,11 @@ dependencies {
 
   implementation("com.resend:resend-java:3.1.0")
 
-  implementation("org.mapstruct:mapstruct:1.6.3")
-  annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+  implementation("org.springdoc:springdoc-openapi-ui:1.8.0")
+
+  implementation("org.mapstruct:mapstruct:1.5.5.Final")
+  annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+  annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")

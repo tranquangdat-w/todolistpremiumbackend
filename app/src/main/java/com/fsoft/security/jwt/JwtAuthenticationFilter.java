@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.util.WebUtils;
+import org.springframework.util.AntPathMatcher;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -28,6 +29,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private JwtTokenManager jwtTokenManager;
+
+  private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
   private JwtProperties jwtProperties;
 
@@ -46,8 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String path = request.getRequestURI();
 
-    // Nếu nằm trong whitelist bỏ qua filter
-    if (WHITELIST_ENDPOINT.contains(path)) {
+    boolean isWhitelisted = WHITELIST_ENDPOINT.stream()
+        .anyMatch(pattern -> pathMatcher.match(pattern, path));
+
+    if (isWhitelisted) {
       filterChain.doFilter(request, response);
       return;
     }

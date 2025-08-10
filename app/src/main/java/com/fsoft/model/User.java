@@ -15,9 +15,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,7 +53,7 @@ public class User {
 
   @NotNull
   @Column(name = "is_active")
-  private boolean isActive;
+  private boolean active;
 
   @Column(name = "verify_token")
   private UUID verifyToken;

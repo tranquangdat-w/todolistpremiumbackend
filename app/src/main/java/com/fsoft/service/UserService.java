@@ -100,6 +100,8 @@ public class UserService {
           String.format("Password is incorrect"),
           HttpStatus.BAD_REQUEST.value());
     }
+    System.out.println(exitsUser);
+    System.out.println(userMapper.toDto(exitsUser));
 
     return userMapper.toDto(exitsUser);
   }
@@ -119,7 +121,7 @@ public class UserService {
           .username(decodedJWT.getClaim("username").asString())
           .email(decodedJWT.getClaim("email").asString())
           .userRole(UserRole.valueOf(decodedJWT.getClaim("userRole").asString()))
-          .isActive(decodedJWT.getClaim("isActive").asBoolean())
+          .active(decodedJWT.getClaim("isActive").asBoolean())
           .build();
 
       String accessToken = jwtTokenManager.generateToken(
