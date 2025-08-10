@@ -1,7 +1,7 @@
 plugins {
   application
 	java
-	id("org.springframework.boot") version "3.5.4"
+	id("org.springframework.boot") version "3.5.0"
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -29,11 +29,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+
   implementation("com.auth0:java-jwt:4.5.0")
+
   implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+
   implementation("com.resend:resend-java:3.1.0")
 
-
+implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
@@ -41,6 +44,7 @@ dependencies {
 
   testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

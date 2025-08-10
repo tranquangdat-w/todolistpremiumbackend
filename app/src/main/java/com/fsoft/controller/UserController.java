@@ -3,6 +3,7 @@ package com.fsoft.controller;
 import org.springframework.http.HttpHeaders;
 import java.time.Duration;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -10,14 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fsoft.dto.ChangePasswordRequestDto;
 import com.fsoft.dto.LoginRequestDto;
 import com.fsoft.dto.RegistrationRequest;
+import com.fsoft.dto.UpdateUserRequestDto;
 import com.fsoft.dto.UserDto;
 import com.fsoft.dto.VerifyRequestDto;
 import com.fsoft.model.User;
@@ -90,6 +94,7 @@ public class UserController {
 
     ResponseCookie accessTokenRes = ResponseCookie
         .from("accessToken", accessToken)
+        .path("/")
         .httpOnly(true)
         .secure(true)
         .maxAge(Duration.ofDays(14))
@@ -99,6 +104,7 @@ public class UserController {
     ResponseCookie refreshTokenRes = ResponseCookie
         .from("refreshToken", refreshToken)
         .httpOnly(true)
+        .path("/")
         .secure(true)
         .maxAge(Duration.ofDays(14))
         .sameSite("none")
@@ -142,8 +148,26 @@ public class UserController {
         .body(Map.of("message", "refresh token successfully"));
   }
 
-  @GetMapping("/hello")
-  public ResponseEntity<Map<String, String>> hello() {
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Hello"));
+  @PutMapping("/{userId}")
+  public ResponseEntity<UserDto> updateUser(
+      @PathVariable UUID userId,
+      @RequestBody UpdateUserRequestDto updateUserRequestDto) {
+
+    UserDto updatedUser = userService.updateUser(
+        userId,
+        updateUserRequestDto);
+
+    return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+  }
+
+  @PutMapping("/{userId}/change_password")
+  public ResponseEntity<Map<String, String>> changePassword(
+      @PathVariable UUID userId,
+      @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+
+    userService.changePassword(userId, changePasswordRequestDto);
+
+    return ResponseEntity.status(HttpStatus.OK).body(
+        Map.of("message", "change password successfully"));
   }
 }

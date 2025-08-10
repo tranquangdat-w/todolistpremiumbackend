@@ -18,11 +18,13 @@ public class PasswordEncoderConfiguration {
     Map<String, PasswordEncoder> encoders = new HashMap<>();
 
     PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 65536, 3);
+
     PasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
 
     final String idForEncode = "argon2";
 
     encoders.put(idForEncode, argon2PasswordEncoder);
+
     encoders.put("bycrypt", bcryptPasswordEncoder);
 
     return new DelegatingPasswordEncoder(idForEncode, encoders);

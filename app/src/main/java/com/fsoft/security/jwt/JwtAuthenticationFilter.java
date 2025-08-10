@@ -1,5 +1,6 @@
 package com.fsoft.security.jwt;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.util.WebUtils;
+import org.springframework.util.AntPathMatcher;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -29,6 +31,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private JwtTokenManager jwtTokenManager;
 
+  private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
   private JwtProperties jwtProperties;
 
   private static final List<String> WHITELIST_ENDPOINT = List.of(
@@ -36,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       "/users/login",
       "/users/verify",
       "/users/logout",
+      "/v3/api-docs",
       "/users/refresh_token");
 
   @Override
@@ -46,8 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String path = request.getRequestURI();
 
-    // Nếu nằm trong whitelist bỏ qua filter
-    if (WHITELIST_ENDPOINT.contains(path)) {
+    boolean isWhitelisted = WHITELIST_ENDPOINT.stream()
+        .anyMatch(pattern -> pathMatcher.match(pattern, path));
+
+    if (isWhitelisted) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -55,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     Cookie cookie = WebUtils.getCookie(request, "accessToken");
 
     // Neu khong co accesstoken thi gui ma loi 401 dang xuat luon
-    if (cookie == null || cookie.getValue().isEmpty()) {
+    if (cookie == null) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
@@ -64,14 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    String accessToken = cookie.getValue();
-    System.out.println(accessToken);
+    String accessToken = cookie.getValue().trim();
 
     // Kiem tra access token
     try {
+      String accessTokenSecretKey = jwtProperties.getAccessTokenSecretKey();
       DecodedJWT decodedJWT = jwtTokenManager.validateToken(
           accessToken,
-          jwtProperties.getAccessTokenSecretKey());
+          accessTokenSecretKey);
 
       String username = decodedJWT.getClaim("username").asString();
 

@@ -19,7 +19,6 @@ public class JwtTokenManager {
         .withIssuedAt(new Date())
         .withExpiresAt(new Date(System.currentTimeMillis() + timeToExpire * 60 * 1000))
         .withClaim("id", user.getId().toString())
-        .withClaim("name", user.getName())
         .withClaim("username", user.getUsername())
         .withClaim("email", user.getEmail())
         .withClaim("userRole", user.getUserRole().name())

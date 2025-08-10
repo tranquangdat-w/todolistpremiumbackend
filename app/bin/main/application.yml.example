@@ -1,4 +1,14 @@
 spring:
   datasource:
     url:
+jwt:
+  accessTokenSecretKey:
+  refreshTokenSecretKey:
+  issuer:
+  accessTokenExpirationMinute:
+  refreshTokenExpirationMinute:
+resend:
+  RESEND_API_KEY:
+  EMAIL_SENDER:
+
 
