@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ColumnRepository extends JpaRepository<BoardColumn, String> {
     ArrayList<BoardColumn> findByBoardId(UUID boardId);
 
-    Optional<BoardColumn> findById(UUID id);
+    Optional<BoardColumn> findById(String id);
 
-    void deleteById(UUID columnId);
+    void deleteById(String columnId);
 }

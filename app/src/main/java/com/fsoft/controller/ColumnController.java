@@ -34,7 +34,7 @@ public class ColumnController {
     }
 
     @DeleteMapping("/{columnId}")
-    public ResponseEntity<Void> deleteColumn(@PathVariable UUID columnId) {
+    public ResponseEntity<Void> deleteColumn(@PathVariable String columnId) {
         columnService.deleteColumn(columnId);
         return ResponseEntity.noContent().build();
     }

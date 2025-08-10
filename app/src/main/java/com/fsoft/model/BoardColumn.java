@@ -19,7 +19,7 @@ public class BoardColumn {
     @Id
     @GeneratedValue
     @Column(name = "column_id")
-    private UUID id;
+    private String id;
 
     @Column(name = "title")
     @NotNull

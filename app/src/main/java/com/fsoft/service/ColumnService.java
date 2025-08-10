@@ -12,9 +12,7 @@ public interface ColumnService {
                                     Date createdAt,
                                     UUID boardId);
 
-    public void deleteColumn(UUID id);
+    public void deleteColumn(String id);
 
-    public BoardColumn updateColumnDetails(UUID id, String title, String description, Date createdAt);
-
-    public ArrayList<BoardColumn> getColumnByUserId(UUID userId);
+    public BoardColumn updateColumnDetails(String id, String title, String description, Date createdAt);
 }

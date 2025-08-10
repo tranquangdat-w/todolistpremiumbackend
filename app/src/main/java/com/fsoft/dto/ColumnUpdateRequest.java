@@ -13,7 +13,7 @@ import java.util.UUID;
 @ToString
 public class ColumnUpdateRequest {
     @NotNull(message = "Column id cannot be null")
-    private UUID id;
+    private String id;
     @NotNull(message = "Title cannot be null")
     private String title;
     private String description;
