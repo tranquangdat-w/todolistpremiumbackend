@@ -1,8 +1,8 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create-drop     # create: tạo mới; create-drop: tạo & xóa khi tắt app
-    show-sql: true              # Log SQL ra console
+      ddl-auto: create-drop
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
