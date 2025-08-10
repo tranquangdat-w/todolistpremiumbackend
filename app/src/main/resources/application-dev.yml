@@ -11,15 +11,3 @@ spring:
     username: postgres
     password: 400103
     driver-class-name: org.postgresql.Driver
-
-jwt:
-  accessTokenSecretKey: fsoftneovimarch-dsafkdjfa
-  refreshTokenSecretKey: fsoftneovimarch-dksjfaks
-  issuer: www.tranquandat.com
-  accessTokenExpirationMinute: 1
-  refreshTokenExpirationMinute: 10
-
-
-resend:
-  RESEND_API_KEY:
-  EMAIL_SENDER: onboarding@resend.dev
