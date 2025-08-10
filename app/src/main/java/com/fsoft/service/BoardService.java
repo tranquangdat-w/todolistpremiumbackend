@@ -4,10 +4,14 @@ import com.fsoft.dto.BoardDto;
 import com.fsoft.dto.CreateBoardDto;
 import com.fsoft.dto.UpdateBoardDto;
 import com.fsoft.exceptions.ApiException;
-import com.fsoft.mapper.BoardMapper;
 import com.fsoft.model.Boards;
 import com.fsoft.model.User;
 import com.fsoft.repository.BoardRepository;
+import com.fsoft.repository.ColumnRepository;
+import com.fsoft.repository.CardRepository;
+import com.fsoft.model.Columns;
+import com.fsoft.model.Cards;
+import com.fsoft.mapper.BoardMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -24,6 +28,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class BoardService {
   private final BoardRepository boardRepository;
+  private final ColumnRepository columnRepository;
+  private final CardRepository cardRepository;
 
   @Transactional
   public void createBoard(UUID userId, CreateBoardDto createBoardDto) {
@@ -70,21 +76,47 @@ public class BoardService {
   @Transactional
   public void deleteBoard(UUID boardId, UUID userId) {
     Boards board = boardRepository.findById(boardId).orElseThrow(
-        () -> new ApiException(
-            "Board not found with id: " + boardId,
-            HttpStatus.NOT_FOUND.value()));
+        () -> new ApiException("Board not found with id: " + boardId, HttpStatus.NOT_FOUND.value()));
 
     if (!board.getUser().getId().equals(userId)) {
-      throw new ApiException(
-          "You can't delete this board " + boardId,
-          HttpStatus.NOT_FOUND.value());
+        throw new ApiException("Unauthorized to delete this board", HttpStatus.FORBIDDEN.value());
     }
 
     boardRepository.delete(board);
   }
 
+  @Transactional
+  public void deleteColumn(UUID boardId, String columnId, UUID userId) {
+    Boards board = boardRepository.findById(boardId).orElseThrow(
+        () -> new ApiException("Board not found with id: " + boardId, HttpStatus.NOT_FOUND.value()));
+
+    if (!board.getUser().getId().equals(userId)) {
+        throw new ApiException("Unauthorized to delete this column", HttpStatus.FORBIDDEN.value());
+    }
+
+    Columns column = columnRepository.findByColumnIdAndBoardId(columnId, boardId).orElseThrow(
+        () -> new ApiException("Column not found with id: " + columnId, HttpStatus.NOT_FOUND.value()));
+
+    columnRepository.delete(column);
+  }
+
+  @Transactional
+  public void deleteCard(UUID boardId, UUID cardId, UUID userId) {
+    Boards board = boardRepository.findById(boardId).orElseThrow(
+        () -> new ApiException("Board not found with id: " + boardId, HttpStatus.NOT_FOUND.value()));
+
+    if (!board.getUser().getId().equals(userId)) {
+        throw new ApiException("Unauthorized to delete this card", HttpStatus.FORBIDDEN.value());
+    }
+
+    Cards card = cardRepository.findByCardIdAndBoardId(cardId, boardId).orElseThrow(
+        () -> new ApiException("Card not found with id: " + cardId, HttpStatus.NOT_FOUND.value()));
+
+    cardRepository.delete(card);
+  }
+
   public Page<BoardDto> getBoardsByUserId(UUID userId, Pageable pageable) {
-    Page<Boards> boards = boardRepository.findByUser_Id(userId, pageable);
-    return boards.map(BoardMapper::toBoardDto);
+    return boardRepository.findByUser_Id(userId, pageable).map(BoardMapper::toBoardDto);
   }
 }
+
