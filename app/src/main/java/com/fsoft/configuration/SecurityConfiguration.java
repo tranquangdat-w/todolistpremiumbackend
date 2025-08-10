@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                 "/users/refresh_token",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/swagger-ui.html").permitAll().anyRequest().authenticated())
+                "/swagger-ui.html").permitAll()
+                .anyRequest().authenticated())
         // Using JWT insted of session management
         .sessionManagement(
             manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,7 +1,7 @@
 plugins {
   application
 	java
-	id("org.springframework.boot") version "3.5.4"
+	id("org.springframework.boot") version "3.5.0"
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -36,11 +36,7 @@ dependencies {
 
   implementation("com.resend:resend-java:3.1.0")
 
-  implementation("org.springdoc:springdoc-openapi-ui:1.8.0")
-
-  implementation("org.mapstruct:mapstruct:1.5.5.Final")
-  annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
-  annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
@@ -48,6 +44,7 @@ dependencies {
 
   testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

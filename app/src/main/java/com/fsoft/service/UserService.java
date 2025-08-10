@@ -100,8 +100,6 @@ public class UserService {
           String.format("Password is incorrect"),
           HttpStatus.BAD_REQUEST.value());
     }
-    System.out.println(exitsUser);
-    System.out.println(userMapper.toDto(exitsUser));
 
     return userMapper.toDto(exitsUser);
   }
@@ -132,6 +130,7 @@ public class UserService {
 
       ResponseCookie accessTokenRes = ResponseCookie
           .from("accessToken", accessToken)
+          .path("/")
           .httpOnly(true)
           .secure(true)
           .maxAge(Duration.ofDays(14))

@@ -1,5 +1,6 @@
 package com.fsoft.security.jwt;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       "/users/login",
       "/users/verify",
       "/users/logout",
+      "/v3/api-docs",
       "/users/refresh_token");
 
   @Override
@@ -60,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     Cookie cookie = WebUtils.getCookie(request, "accessToken");
 
     // Neu khong co accesstoken thi gui ma loi 401 dang xuat luon
-    if (cookie == null || cookie.getValue().isEmpty()) {
+    if (cookie == null) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
@@ -69,13 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    String accessToken = cookie.getValue();
+    String accessToken = cookie.getValue().trim();
 
     // Kiem tra access token
     try {
+      String accessTokenSecretKey = jwtProperties.getAccessTokenSecretKey();
       DecodedJWT decodedJWT = jwtTokenManager.validateToken(
           accessToken,
-          jwtProperties.getAccessTokenSecretKey());
+          accessTokenSecretKey);
 
       String username = decodedJWT.getClaim("username").asString();
 

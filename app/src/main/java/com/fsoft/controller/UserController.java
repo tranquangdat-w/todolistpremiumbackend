@@ -94,6 +94,7 @@ public class UserController {
 
     ResponseCookie accessTokenRes = ResponseCookie
         .from("accessToken", accessToken)
+        .path("/")
         .httpOnly(true)
         .secure(true)
         .maxAge(Duration.ofDays(14))
@@ -103,6 +104,7 @@ public class UserController {
     ResponseCookie refreshTokenRes = ResponseCookie
         .from("refreshToken", refreshToken)
         .httpOnly(true)
+        .path("/")
         .secure(true)
         .maxAge(Duration.ofDays(14))
         .sameSite("none")
