@@ -1,30 +1,25 @@
-package com.fsoft.dto;
-
-import java.time.LocalDate;
-import java.util.UUID;
+package com.fsoft.security.jwt;
 
 import com.fsoft.model.UserRole;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-@Setter
+import java.time.LocalDate;
+import java.util.UUID;
+
 @Getter
-@Builder
-@ToString
+@Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class UserDto {
+public class JwtPayload {
   private UUID id;
-  private String name;
   private String username;
   private String email;
   private UserRole userRole;
   private boolean active;
-  private String avatar;
   private LocalDate createdAt;
 }

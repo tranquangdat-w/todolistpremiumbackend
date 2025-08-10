@@ -1,6 +1,8 @@
 package com.fsoft.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,7 +33,6 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtProperties jwtProperties;
   private final JwtTokenManager jwtTokenManager;
-  private final UserMapper userMapper;
 
   public User registration(
       String username,
@@ -46,7 +47,8 @@ public class UserService {
         .name(name)
         .email(email)
         .password(passwordEncoder.encode(password))
-        .verifyToken(UUID.randomUUID())
+        .createdAt(LocalDate.now())
+        .verifyToken(UUID.randomUUID().toString())
         .build();
 
     userRepository.save(user);
@@ -101,7 +103,7 @@ public class UserService {
           HttpStatus.BAD_REQUEST.value());
     }
 
-    return userMapper.toDto(exitsUser);
+    return UserMapper.toUserDto(exitsUser);
   }
 
   public ResponseCookie refreshToken(String refreshToken) {
@@ -119,6 +121,7 @@ public class UserService {
           .username(decodedJWT.getClaim("username").asString())
           .email(decodedJWT.getClaim("email").asString())
           .userRole(UserRole.valueOf(decodedJWT.getClaim("userRole").asString()))
+          .createdAt(LocalDate.parse(decodedJWT.getClaim("createdAt").asString()))
           .active(decodedJWT.getClaim("isActive").asBoolean())
           .build();
 
@@ -156,7 +159,7 @@ public class UserService {
 
     userRepository.save(user);
 
-    return userMapper.toDto(user);
+    return UserMapper.toUserDto(user);
   }
 
   @Transactional

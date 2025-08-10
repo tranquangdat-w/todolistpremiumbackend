@@ -1,5 +1,6 @@
 package com.fsoft.model;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -56,8 +57,12 @@ public class User {
   private boolean active;
 
   @Column(name = "verify_token")
-  private UUID verifyToken;
+  private String verifyToken;
 
   @Column(name = "avatar")
   private String avatar;
+
+  @NotNull
+  @Column(name = "created_at")
+  private LocalDate createdAt;
 }

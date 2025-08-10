@@ -11,8 +11,11 @@ CREATE TABLE users (
 
     is_active BOOLEAN NOT NULL DEFAULT FALSE,
     
-    verify_token UUID DEFAULT gen_random_uuid(),
+    verify_token VARCHAR(36),
 
-    avatar VARCHAR(255)
+    avatar VARCHAR(255),
+
+    created_at date
 );
+
 
