@@ -44,7 +44,7 @@ public class CardService {
         Cards card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
 
-        card.setMainBranch(true);
+//        card.setMainBranch(true);
         cardRepository.save(card);
     }
 }
