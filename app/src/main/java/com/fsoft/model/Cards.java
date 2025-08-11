@@ -2,7 +2,6 @@ package com.fsoft.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.Date;
 import java.util.UUID;
 
@@ -10,7 +9,6 @@ import java.util.UUID;
 @Data
 @Table(name = "cards")
 public class Cards {
-
     @Id
     @Column(name = "card_id")
     private UUID cardId;
@@ -32,5 +30,5 @@ public class Cards {
 
     @ManyToOne
     @JoinColumn(name = "column_id", nullable = false)
-    private BoardColumn column;
+    private Columns column;
 }
