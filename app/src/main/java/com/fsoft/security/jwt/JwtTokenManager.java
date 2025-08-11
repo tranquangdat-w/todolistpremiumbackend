@@ -23,6 +23,7 @@ public class JwtTokenManager {
         .withClaim("email", user.getEmail())
         .withClaim("userRole", user.getUserRole().name())
         .withClaim("isActive", user.isActive())
+        .withClaim("createdAt", user.getCreatedAt().toString())
         .sign(Algorithm.HMAC256(secretKey));
   }
 

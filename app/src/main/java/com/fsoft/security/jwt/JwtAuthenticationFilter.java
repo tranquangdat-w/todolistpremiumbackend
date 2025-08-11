@@ -1,16 +1,15 @@
 package com.fsoft.security.jwt;
 
-import java.io.Console;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import jakarta.servlet.FilterChain;
@@ -25,6 +24,7 @@ import org.springframework.util.AntPathMatcher;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fsoft.model.UserRole;
 
 @Component
 @AllArgsConstructor
@@ -72,28 +72,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     String accessToken = cookie.getValue().trim();
+    DecodedJWT decodedJWT;
 
     // Kiem tra access token
     try {
       String accessTokenSecretKey = jwtProperties.getAccessTokenSecretKey();
-      DecodedJWT decodedJWT = jwtTokenManager.validateToken(
+      decodedJWT = jwtTokenManager.validateToken(
           accessToken,
           accessTokenSecretKey);
 
-      String username = decodedJWT.getClaim("username").asString();
-
-      String role = decodedJWT.getClaim("userRole").asString();
-
-      List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-
-      UserDetails userDetails = new User(username, "", authorities);
-
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-          userDetails, null, authorities);
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-
-      filterChain.doFilter(request, response);
     } catch (TokenExpiredException tokenExpiredException) {
       // Call api refresh token neu accesstoken het han
       response.setStatus(HttpServletResponse.SC_GONE);
@@ -107,5 +94,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       response.getWriter().flush();
       return;
     }
+
+    String role = decodedJWT.getClaim("userRole").asString();
+
+    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+
+    JwtPayload userInformation = JwtPayload.builder()
+        .id(UUID.fromString(decodedJWT.getClaim("id").asString()))
+        .username(decodedJWT.getClaim("username").asString())
+        .email(decodedJWT.getClaim("email").asString())
+        .userRole(UserRole.valueOf(decodedJWT.getClaim("userRole").asString()))
+        .active(decodedJWT.getClaim("isActive").asBoolean())
+        .createdAt(LocalDate.parse(decodedJWT.getClaim("createdAt").asString()))
+        .build();
+
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        userInformation, null, authorities);
+
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    filterChain.doFilter(request, response);
   }
 }

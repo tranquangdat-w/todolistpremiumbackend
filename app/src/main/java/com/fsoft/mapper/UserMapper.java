@@ -1,14 +1,14 @@
 package com.fsoft.mapper;
 
-import org.springframework.stereotype.Component;
-
 import com.fsoft.dto.UserDto;
 import com.fsoft.model.User;
 
-@Component
-public class UserMapper {
+public final class UserMapper {
 
-  public UserDto toDto(User user) {
+  private UserMapper() {
+  }
+
+  public static UserDto toUserDto(User user) {
     if (user == null) {
       return null;
     }
@@ -21,6 +21,7 @@ public class UserMapper {
     dto.setUserRole(user.getUserRole());
     dto.setActive(user.isActive());
     dto.setAvatar(user.getAvatar());
+    dto.setCreatedAt(user.getCreatedAt());
     return dto;
   }
 }
