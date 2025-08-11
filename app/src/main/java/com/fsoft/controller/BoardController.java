@@ -7,7 +7,7 @@ import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.BoardService;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,62 +20,56 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.fsoft.utils.PageableValidator;
-import com.fsoft.model.Boards;
-
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/boards")
 public class BoardController {
-  private final BoardService boardService;
+    private final BoardService boardService;
 
-  @PostMapping
-  public ResponseEntity<Map<String, String>> createBoard(
-      @Valid @RequestBody CreateBoardDto createBoardDto,
-      @AuthenticationPrincipal JwtPayload jwtPayload) {
-    UUID userId = jwtPayload.getId();
+    @PostMapping
+    public ResponseEntity<Map<String, String>> createBoard(
+            @Valid @RequestBody CreateBoardDto createBoardDto,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
+        UUID userId = jwtPayload.getId();
+        boardService.createBoard(userId, createBoardDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Create new board successfully"));
+    }
 
-    boardService.createBoard(userId, createBoardDto);
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardDto> getBoardDetail(
+            @PathVariable UUID boardId,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
+        UUID userId = jwtPayload.getId();
+        BoardDto board = boardService.getBoardDetail(boardId, userId);
+        return ResponseEntity.ok(board);
+    }
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(
-        Map.of("message", "Create new board successfully"));
-  }
+    @PutMapping("/{boardId}")
+    public ResponseEntity<Map<String, String>> updateBoard(
+            @PathVariable UUID boardId,
+            @Valid @RequestBody UpdateBoardDto updateBoardDto,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
+        UUID userId = jwtPayload.getId();
+        boardService.updateBoard(boardId, userId, updateBoardDto);
+        return ResponseEntity.ok(Map.of("message", "Update board successfully"));
+    }
 
-  @PutMapping("/{boardId}")
-  public ResponseEntity<Map<String, String>> updateBoard(
-      @PathVariable UUID boardId,
-      @Valid @RequestBody UpdateBoardDto updateBoardDto,
-      @AuthenticationPrincipal JwtPayload jwtPayload) {
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<Map<String, String>> deleteBoard(
+            @PathVariable UUID boardId,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
+        UUID userId = jwtPayload.getId();
+        boardService.deleteBoard(boardId, userId);
+        return ResponseEntity.ok(Map.of("message", "Board deleted successfully"));
+    }
 
-    UUID userId = jwtPayload.getId();
-
-    boardService.updateBoard(boardId, userId, updateBoardDto);
-
-    return ResponseEntity.ok(Map.of("message", "Update board successfully"));
-  }
-
-  @DeleteMapping("/{boardId}")
-  public ResponseEntity<Map<String, String>> deleteBoard(
-      @PathVariable UUID boardId,
-      @AuthenticationPrincipal JwtPayload jwtPayload) {
-
-    UUID userId = jwtPayload.getId();
-
-    boardService.deleteBoard(boardId, userId);
-
-    return ResponseEntity.ok(Map.of("message", "Delete board successfully"));
-  }
-
-  @GetMapping
-  public ResponseEntity<PageDto<BoardDto>> getBoardsByUserId(
-      @AuthenticationPrincipal JwtPayload jwtPayload,
-      Pageable pageable) {
-
-    PageableValidator.validate(pageable, Boards.class);
-
-    UUID userId = jwtPayload.getId();
-
-    Page<BoardDto> page = boardService.getBoardsByUserId(userId, pageable);
-    return ResponseEntity.ok(new PageDto<>(page));
-  }
+    @GetMapping
+    public ResponseEntity<PageDto<BoardDto>> getBoardsByUserId(
+            @AuthenticationPrincipal JwtPayload jwtPayload,
+            Pageable pageable) {
+        UUID userId = jwtPayload.getId();
+        Page<BoardDto> page = boardService.getBoardsByUserId(userId, pageable);
+        return ResponseEntity.ok(new PageDto<>(page));
+    }
 }
