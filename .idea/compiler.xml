@@ -12,11 +12,4 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="21" />
   </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="todolistpremiun.app" options="-parameters" />
-      <module name="todolistpremiun.app.main" options="-parameters" />
-      <module name="todolistpremiun.app.test" options="-parameters" />
-    </option>
-  </component>
 </project>

@@ -60,10 +60,36 @@ public class BoardController {
       @AuthenticationPrincipal JwtPayload jwtPayload) {
 
     UUID userId = jwtPayload.getId();
-
     boardService.deleteBoard(boardId, userId);
 
-    return ResponseEntity.ok(Map.of("message", "Delete board successfully"));
+    return ResponseEntity.status(HttpStatus.OK).body(
+        Map.of("message", "Board deleted successfully"));
+  }
+
+  @DeleteMapping("/{boardId}/columns/{columnId}")
+  public ResponseEntity<Map<String, String>> deleteColumn(
+      @PathVariable UUID boardId,
+      @PathVariable String columnId,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+
+    UUID userId = jwtPayload.getId();
+    boardService.deleteColumn(boardId, columnId, userId);
+
+    return ResponseEntity.status(HttpStatus.OK).body(
+        Map.of("message", "Column deleted successfully"));
+  }
+
+  @DeleteMapping("/{boardId}/cards/{cardId}")
+  public ResponseEntity<Map<String, String>> deleteCard(
+      @PathVariable UUID boardId,
+      @PathVariable UUID cardId,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+
+    UUID userId = jwtPayload.getId();
+    boardService.deleteCard(boardId, cardId, userId);
+
+    return ResponseEntity.status(HttpStatus.OK).body(
+        Map.of("message", "Card deleted successfully"));
   }
 
   @GetMapping
