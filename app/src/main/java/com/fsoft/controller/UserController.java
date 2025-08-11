@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fsoft.dto.ChangePasswordRequestDto;
 import com.fsoft.dto.LoginRequestDto;
@@ -25,10 +29,12 @@ import com.fsoft.dto.UpdateUserRequestDto;
 import com.fsoft.dto.UserDto;
 import com.fsoft.dto.VerifyRequestDto;
 import com.fsoft.model.User;
+import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.security.jwt.JwtProperties;
 import com.fsoft.security.jwt.JwtTokenManager;
 import com.fsoft.service.SendMailService;
 import com.fsoft.service.UserService;
+import com.fsoft.utils.ImageValidator;
 import com.resend.core.exception.ResendException;
 
 import jakarta.validation.Valid;
@@ -148,10 +154,12 @@ public class UserController {
         .body(Map.of("message", "refresh token successfully"));
   }
 
-  @PutMapping("/{userId}")
+  @PutMapping
   public ResponseEntity<UserDto> updateUser(
-      @PathVariable UUID userId,
-      @RequestBody UpdateUserRequestDto updateUserRequestDto) {
+      @Valid @RequestBody UpdateUserRequestDto updateUserRequestDto,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+
+    UUID userId = jwtPayload.getId();
 
     UserDto updatedUser = userService.updateUser(
         userId,
@@ -160,10 +168,25 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
   }
 
-  @PutMapping("/{userId}/change_password")
+  @PutMapping("/avatar")
+  public ResponseEntity<UserDto> updateUser(
+      @RequestPart(value = "avatar", required = false) MultipartFile avatarFile,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+
+    UUID userId = jwtPayload.getId();
+
+    ImageValidator.validateAvatar(avatarFile);
+
+    UserDto updatedUser = userService.updateUser(userId, avatarFile);
+
+    return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+  }
+
+  @PutMapping("/change_password")
   public ResponseEntity<Map<String, String>> changePassword(
-      @PathVariable UUID userId,
-      @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+      @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+    UUID userId = jwtPayload.getId();
 
     userService.changePassword(userId, changePasswordRequestDto);
 

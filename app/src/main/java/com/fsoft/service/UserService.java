@@ -2,7 +2,6 @@ package com.fsoft.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fsoft.dto.ChangePasswordRequestDto;
@@ -33,6 +33,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtProperties jwtProperties;
   private final JwtTokenManager jwtTokenManager;
+  private final DropboxService dropboxService;
 
   public User registration(
       String username,
@@ -143,14 +144,35 @@ public class UserService {
       return accessTokenRes;
 
     } catch (Exception exception) {
-      System.out.println(exception);
-      exception.printStackTrace();
       throw new ApiException("Please login again", HttpStatus.UNAUTHORIZED.value());
     }
   }
 
   @Transactional
+  public UserDto updateUser(UUID userId, MultipartFile avatarFile) {
+    User user = getUserByIdOrThrow(userId);
+
+    try {
+      String url = dropboxService
+          .uploadImage(avatarFile, userId)
+          .orElseThrow(
+              () -> new ApiException("Some error occur when upload avatar"));
+
+      user.setAvatar(url);
+
+      userRepository.save(user);
+
+      return UserMapper.toUserDto(user);
+    } catch (Exception e) {
+      System.out.println(e);
+      e.printStackTrace();
+      throw new ApiException(e.getMessage());
+    }
+  }
+
+  @Transactional
   public UserDto updateUser(UUID userId, UpdateUserRequestDto updateUserRequestDto) {
+
     User user = getUserByIdOrThrow(userId);
 
     if (updateUserRequestDto.getName() != null) {

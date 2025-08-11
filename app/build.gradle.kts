@@ -36,7 +36,8 @@ dependencies {
 
   implementation("com.resend:resend-java:3.1.0")
 
-implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+  implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
