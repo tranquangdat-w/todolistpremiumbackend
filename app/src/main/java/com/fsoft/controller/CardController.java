@@ -25,4 +25,14 @@ public class CardController {
         cardService.deleteCard(boardId, cardId, jwtPayload.getId());
         return ResponseEntity.ok(Map.of("message", "Card deleted successfully"));
     }
+
+    @PostMapping("/{cardId}/push-main")
+    public ResponseEntity<Map<String, String>> pushToMain(
+            @PathVariable UUID cardId,
+            @RequestParam UUID boardId,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
+
+        cardService.pushToMain(boardId, cardId, jwtPayload.getId());
+        return ResponseEntity.ok(Map.of("message", "Card pushed to main branch successfully"));
+    }
 }

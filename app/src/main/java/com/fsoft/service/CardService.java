@@ -32,4 +32,19 @@ public class CardService {
 
         cardRepository.delete(card);
     }
+
+    public void pushToMain(UUID boardId, UUID cardId, UUID userId) {
+        Boards board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+
+        if (!board.getUser().getId().equals(userId)) {
+            throw new ApiException("You don't have permission to push this card", HttpStatus.FORBIDDEN.value());
+        }
+
+        Cards card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
+
+        card.setMainBranch(true);
+        cardRepository.save(card);
+    }
 }
