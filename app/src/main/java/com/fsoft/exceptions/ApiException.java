@@ -10,4 +10,9 @@ public class ApiException extends RuntimeException {
     super(message);
     this.statusCode = statusCode;
   }
+
+  public ApiException(String message) {
+    super(message);
+    this.statusCode = 500;
+  }
 }

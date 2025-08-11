@@ -25,7 +25,7 @@ public class ColumnController {
     @Autowired
     private final ColumnService columnService;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<ColumnDto> addColumn(@RequestBody @Valid ColumnRegistrationRequest request) {
         ColumnDto boardColumn = columnService.addNewColumn(
                 request.getTitle(),
