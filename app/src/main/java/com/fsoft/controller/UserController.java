@@ -1,5 +1,6 @@
 package com.fsoft.controller;
 
+import com.fsoft.dto.*;
 import org.springframework.http.HttpHeaders;
 import java.time.Duration;
 import java.util.Map;
@@ -22,12 +23,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fsoft.dto.ChangePasswordRequestDto;
-import com.fsoft.dto.LoginRequestDto;
-import com.fsoft.dto.RegistrationRequest;
-import com.fsoft.dto.UpdateUserRequestDto;
-import com.fsoft.dto.UserDto;
-import com.fsoft.dto.VerifyRequestDto;
 import com.fsoft.model.User;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.security.jwt.JwtProperties;
@@ -192,5 +187,26 @@ public class UserController {
 
     return ResponseEntity.status(HttpStatus.OK).body(
         Map.of("message", "change password successfully"));
+  }
+
+  @PostMapping("/send-otp")
+  public ResponseEntity<Map<String, String>> sendOtp(
+          @Valid @RequestBody ForgotPasswordRequestDto requestDto) throws ResendException{
+
+    userService.sendForgotPasswordOtp(requestDto.getEmail());
+    return ResponseEntity.ok(Map.of("message", "OTP send to your email"));
+  }
+
+  @PostMapping("/verify-otp-and-change-password")
+  public ResponseEntity<Map<String, String>> verifyOtpAndChangePassword(
+          @Valid @RequestBody VerifyAndChangePasswordRequestDto request) {
+    ChangePasswordRequestDto changePasswordRequestDto = new ChangePasswordRequestDto();
+    changePasswordRequestDto.setOldPassword(request.getOldPassword());
+    changePasswordRequestDto.setNewPassword(request.getNewPassword());
+    changePasswordRequestDto.setConfirmPassword(request.getConfirmPassword());
+
+    Map<String, String> result = userService.verifyOtpAndChangePassword(
+            request.getEmail(), request.getOtp(), changePasswordRequestDto);
+    return ResponseEntity.ok(result);
   }
 }
