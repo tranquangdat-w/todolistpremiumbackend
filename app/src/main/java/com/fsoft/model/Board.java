@@ -26,7 +26,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "boards")
-public class Boards {
+public class Board {
   @Id
   @GeneratedValue
   @Column(name = "id")
@@ -40,7 +40,7 @@ public class Boards {
   private String description;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "owner_id")
   private User user;
 
   @NotNull

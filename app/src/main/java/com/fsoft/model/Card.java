@@ -1,20 +1,26 @@
 package com.fsoft.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Date;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 @Entity
 @Data
 @Table(name = "cards")
-public class Cards {
+public class Card {
   @Id
   @Column(name = "id")
   private UUID cardId;
 
   @Column(name = "title", nullable = false)
-  private String taskTitle;
+  private String title;
 
   @Column(name = "description")
   private String description;
@@ -30,5 +36,5 @@ public class Cards {
 
   @ManyToOne
   @JoinColumn(name = "column_id", nullable = false)
-  private Columns column;
+  private Columnn column;
 }

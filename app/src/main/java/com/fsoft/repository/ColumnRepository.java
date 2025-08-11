@@ -1,9 +1,9 @@
 package com.fsoft.repository;
 
-import com.fsoft.model.Columns;
+import com.fsoft.model.Columnn;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ColumnRepository extends JpaRepository<Columns, String> {
+public interface ColumnRepository extends JpaRepository<Columnn, String> {
 }

@@ -10,5 +10,8 @@ jwt:
 resend:
   RESEND_API_KEY:
   EMAIL_SENDER:
-
+dropbox:
+  REFRESH_TOKEN_API_DROP_BOX:
+  APP_KEY:
+  APP_SECRET:
 
