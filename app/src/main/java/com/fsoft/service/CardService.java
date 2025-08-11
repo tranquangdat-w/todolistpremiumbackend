@@ -16,35 +16,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class CardService {
-    private final CardRepository cardRepository;
-    private final BoardRepository boardRepository;
+  private final CardRepository cardRepository;
+  private final BoardRepository boardRepository;
 
-    public void deleteCard(UUID boardId, UUID cardId, UUID userId) {
-        Boards board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+  public void deleteCard(UUID boardId, UUID cardId, UUID userId) {
+    Boards board = boardRepository.findById(boardId)
+        .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
 
-        if (!board.getUser().getId().equals(userId)) {
-            throw new ApiException("You don't have permission to delete this card", HttpStatus.FORBIDDEN.value());
-        }
-
-        Cards card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
-
-        cardRepository.delete(card);
+    if (!board.getUser().getId().equals(userId)) {
+      throw new ApiException("You don't have permission to delete this card", HttpStatus.FORBIDDEN.value());
     }
 
-    public void pushToMain(UUID boardId, UUID cardId, UUID userId) {
-        Boards board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+    Cards card = cardRepository.findById(cardId)
+        .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
 
-        if (!board.getUser().getId().equals(userId)) {
-            throw new ApiException("You don't have permission to push this card", HttpStatus.FORBIDDEN.value());
-        }
-
-        Cards card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
-
-        card.setMainBranch(true);
-        cardRepository.save(card);
-    }
+    cardRepository.delete(card);
+  }
 }

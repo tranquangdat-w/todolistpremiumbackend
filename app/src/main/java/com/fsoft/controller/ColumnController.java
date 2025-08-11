@@ -12,17 +12,17 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/columns")
+@RequestMapping("/columns")
 public class ColumnController {
-    private final ColumnService columnService;
+  private final ColumnService columnService;
 
-    @DeleteMapping("/{columnId}")
-    public ResponseEntity<Map<String, String>> deleteColumn(
-            @PathVariable String columnId,
-            @RequestParam UUID boardId,
-            @AuthenticationPrincipal JwtPayload jwtPayload) {
+  @DeleteMapping("/{columnId}")
+  public ResponseEntity<Map<String, String>> deleteColumn(
+      @PathVariable String columnId,
+      @RequestParam UUID boardId,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
 
-        columnService.deleteColumn(boardId, columnId, jwtPayload.getId());
-        return ResponseEntity.ok(Map.of("message", "Column deleted successfully"));
-    }
+    columnService.deleteColumn(boardId, columnId, jwtPayload.getId());
+    return ResponseEntity.ok(Map.of("message", "Column deleted successfully"));
+  }
 }
