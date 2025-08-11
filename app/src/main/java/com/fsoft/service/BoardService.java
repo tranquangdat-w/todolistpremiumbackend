@@ -9,7 +9,7 @@ import com.fsoft.model.User;
 import com.fsoft.repository.BoardRepository;
 import com.fsoft.repository.ColumnRepository;
 import com.fsoft.repository.CardRepository;
-import com.fsoft.model.Columns;
+import com.fsoft.model.BoardColumn;
 import com.fsoft.model.Cards;
 import com.fsoft.mapper.BoardMapper;
 
@@ -94,7 +94,7 @@ public class BoardService {
         throw new ApiException("Unauthorized to delete this column", HttpStatus.FORBIDDEN.value());
     }
 
-    Columns column = columnRepository.findByColumnIdAndBoardId(columnId, boardId).orElseThrow(
+    BoardColumn column = columnRepository.findByIdAndBoardId(columnId, boardId).orElseThrow(
         () -> new ApiException("Column not found with id: " + columnId, HttpStatus.NOT_FOUND.value()));
 
     columnRepository.delete(column);
@@ -109,9 +109,10 @@ public class BoardService {
         throw new ApiException("Unauthorized to delete this card", HttpStatus.FORBIDDEN.value());
     }
 
-    Cards card = cardRepository.findByCardIdAndBoardId(cardId, boardId).orElseThrow(
-        () -> new ApiException("Card not found with id: " + cardId, HttpStatus.NOT_FOUND.value()));
+//    Cards card = cardRepository.findByCardIdAndColumnId(cardId, columnId).orElseThrow(
+//        () -> new ApiException("Card not found with id: " + cardId, HttpStatus.NOT_FOUND.value()));
 
+    Cards card = cardRepository.findById(cardId).orElseThrow(() -> new ApiException("Card not found with id: " + cardId, HttpStatus.NOT_FOUND.value()));
     cardRepository.delete(card);
   }
 

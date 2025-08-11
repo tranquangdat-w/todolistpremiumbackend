@@ -6,5 +6,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CardRepository extends JpaRepository<Cards, UUID> {
-    Optional<Cards> findByCardIdAndBoardId(UUID cardId, UUID boardId);
+    Optional<Cards> findById(UUID id);
 }

@@ -13,4 +13,6 @@ public interface ColumnRepository extends JpaRepository<BoardColumn, String> {
     Optional<BoardColumn> findById(String id);
 
     void deleteById(String columnId);
+
+    Optional<BoardColumn> findByIdAndBoardId(String columnId, UUID boardId);
 }

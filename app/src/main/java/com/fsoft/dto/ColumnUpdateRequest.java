@@ -12,11 +12,10 @@ import java.util.UUID;
 @Setter
 @ToString
 public class ColumnUpdateRequest {
-    @NotNull(message = "Column id cannot be null")
-    private String id;
     @NotNull(message = "Title cannot be null")
     private String title;
     private String description;
     private Date createdAt;
     private String comment;
+    private UUID boardId;
 }

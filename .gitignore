@@ -13,3 +13,5 @@ application-prod.yml
 .project
 
 .settings
+
+.idea

@@ -17,7 +17,6 @@ import java.util.UUID;
 @Table(name="columns")
 public class BoardColumn {
     @Id
-    @GeneratedValue
     @Column(name = "column_id")
     private String id;
 
@@ -31,7 +30,7 @@ public class BoardColumn {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(referencedColumnName = "id", name = "board_id", insertable = false, updatable = false)
-    private Board board;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "id", name = "board_id")
+    private Boards board;
 }

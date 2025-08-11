@@ -59,7 +59,7 @@ public class User {
   @Column(name = "verify_token")
   private String verifyToken;
 
-  @Column(name = "avatar")
+  @Column(name = "avatar", columnDefinition = "text")
   private String avatar;
 
   @NotNull

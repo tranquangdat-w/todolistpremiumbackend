@@ -32,5 +32,5 @@ public class Cards {
 
     @ManyToOne
     @JoinColumn(name = "column_id", nullable = false)
-    private Columns column;
+    private BoardColumn column;
 }

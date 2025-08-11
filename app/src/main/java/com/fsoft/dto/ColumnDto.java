@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ColumnDto {
-    private UUID id;
+    private String id;
     private String title;
     private String description;
     private Date createdAt;
