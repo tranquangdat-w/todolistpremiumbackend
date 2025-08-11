@@ -9,6 +9,12 @@ build/
 .apt_generated
 .classpath
 .factorypath
+application.yml
+application-dev.yml
+application-prod.yml
+
+*.class
+
 .project
 .settings
 .springBeans
@@ -39,3 +45,5 @@ out/
 ### Application Properties ###
 application.yml
 application.properties
+
+.idea

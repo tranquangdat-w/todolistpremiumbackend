@@ -2,15 +2,19 @@ package com.fsoft.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
 @Table(name = "columns")
+@ToString
 public class Columns {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "column_id")
     private String columnId;
 
@@ -23,10 +27,7 @@ public class Columns {
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "board_id", nullable = false)
     private Boards board;
-
-    @OneToMany(mappedBy = "column", cascade = CascadeType.ALL)
-    private List<Cards> cards;
 }
