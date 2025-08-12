@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class VerifyRequestDto {
-  @NotEmpty(message = "Your usename cannot be empty")
+  @NotEmpty(message = "Your use_name cannot be empty")
   private String username;
 
   @NotEmpty(message = "Token can't be empty")

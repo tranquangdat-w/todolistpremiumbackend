@@ -65,4 +65,7 @@ public class User {
   @NotNull
   @Column(name = "created_at")
   private LocalDate createdAt;
+
+  @Column(name = "otp")
+  private String otp;
 }

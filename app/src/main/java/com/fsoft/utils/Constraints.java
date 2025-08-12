@@ -3,7 +3,7 @@ package com.fsoft.utils;
 import lombok.Setter;
 
 @Setter
-public class Constrants {
+public class Constraints {
   public static final String WEBSITE_DOMAIN_DEV = "http://localhost:5173";
   public static final String CONTENT_MAIL_VERIFY_ACCOUNT = """
       <!DOCTYPE html>
