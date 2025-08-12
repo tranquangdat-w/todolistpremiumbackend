@@ -200,13 +200,12 @@ public class UserController {
   @PostMapping("/verify-otp-and-change-password")
   public ResponseEntity<Map<String, String>> verifyOtpAndChangePassword(
           @Valid @RequestBody VerifyAndChangePasswordRequestDto request) {
-    ChangePasswordRequestDto changePasswordRequestDto = new ChangePasswordRequestDto();
-    changePasswordRequestDto.setOldPassword(request.getOldPassword());
-    changePasswordRequestDto.setNewPassword(request.getNewPassword());
-    changePasswordRequestDto.setConfirmPassword(request.getConfirmPassword());
+    VerifyAndChangePasswordRequestDto verifyAndChangePasswordRequestDto = new VerifyAndChangePasswordRequestDto();
+    verifyAndChangePasswordRequestDto.setNewPassword(request.getNewPassword());
+    verifyAndChangePasswordRequestDto.setConfirmPassword(request.getConfirmPassword());
 
     Map<String, String> result = userService.verifyOtpAndChangePassword(
-            request.getEmail(), request.getOtp(), changePasswordRequestDto);
+            request.getEmail(), request.getOtp(), verifyAndChangePasswordRequestDto);
     return ResponseEntity.ok(result);
   }
 }

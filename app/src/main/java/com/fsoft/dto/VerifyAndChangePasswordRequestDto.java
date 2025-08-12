@@ -12,9 +12,6 @@ public class VerifyAndChangePasswordRequestDto {
     @NotBlank(message = "OTP is required")
     private String otp;
 
-    @NotBlank(message = "Old password is required")
-    private String oldPassword;
-
     @NotBlank(message = "New password is required")
     @PasswordConstraints
     private String newPassword;

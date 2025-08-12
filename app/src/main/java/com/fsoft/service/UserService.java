@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import com.fsoft.dto.VerifyAndChangePasswordRequestDto;
 import com.resend.core.exception.ResendException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -259,7 +260,8 @@ public class UserService {
   }
 
   @Transactional
-  public Map<String, String> verifyOtpAndChangePassword(String email, String otp, ChangePasswordRequestDto changePasswordRequestDto) {
+  public Map<String, String> verifyOtpAndChangePassword(
+          String email, String otp, VerifyAndChangePasswordRequestDto verifyAndChangePasswordRequestDto) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ApiException(
                     String.format("User with email %s is not exists", email),
@@ -269,11 +271,25 @@ public class UserService {
       throw new ApiException("Invalid OTP", HttpStatus.BAD_REQUEST.value());
     }
 
-    changePassword(user.getId(), changePasswordRequestDto);
+    resetPassword(email, verifyAndChangePasswordRequestDto.getNewPassword(), verifyAndChangePasswordRequestDto.getConfirmPassword());
 
     user.setOtp(null);
     userRepository.save(user);
 
     return Map.of("message", "OTP verified and password changed successfully");
+  }
+
+  @Transactional
+  public void resetPassword(String email, String newPassword, String confirmPassword) {
+    if (!newPassword.equals(confirmPassword)) {
+      throw new ApiException("Passwords do not match");
+    }
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ApiException("User not found with email: " + email));
+
+    String encodedPassword = passwordEncoder.encode(newPassword);
+    user.setPassword(encodedPassword);
+    userRepository.save(user);
   }
 }

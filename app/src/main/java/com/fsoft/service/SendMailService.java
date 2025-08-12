@@ -44,9 +44,9 @@ public class SendMailService {
 
   public void sendForgotPasswordMail(String email, String username, String otp) throws ResendException {
     String sendOtpLink = String.format(
-            "%s/users/verfication?username=%s&token=%s",
+            "%s/users/verfication?email=%s&otp=%s",
             WEBSITE_DOMAIN_DEV,
-            username,
+            email,
             otp
     );
 
