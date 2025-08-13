@@ -1,9 +1,18 @@
 package com.fsoft.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.sql.Date;
 import java.util.UUID;
 
-public class CardDtoTest {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CardDto {
     private UUID cardID;
     private String taskTitle;
     private String description;

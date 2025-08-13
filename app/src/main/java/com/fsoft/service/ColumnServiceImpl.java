@@ -1,11 +1,14 @@
 package com.fsoft.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fsoft.dto.CardDto;
 import com.fsoft.dto.ColumnDto;
 import com.fsoft.exceptions.ApiException;
 import com.fsoft.model.BoardColumn;
 import com.fsoft.model.Boards;
+import com.fsoft.model.Cards;
 import com.fsoft.repository.BoardRepository;
+import com.fsoft.repository.CardRepository;
 import com.fsoft.repository.ColumnRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,8 @@ public class ColumnServiceImpl implements ColumnService {
     @Autowired
     ColumnRepository columnRepository;
     @Autowired
+    CardRepository cardRepository;
+    @Autowired
     ObjectMapper objectMapper;
 
     @Override
@@ -39,6 +44,22 @@ public class ColumnServiceImpl implements ColumnService {
         columnRepository.save(boardColumn);
         ColumnDto columnDto =  objectMapper.convertValue(boardColumn, ColumnDto.class);
         columnDto.setBoardId(board.getId());
+        return columnDto;
+    }
+
+    @Override
+    public ColumnDto getColumnById(String id) {
+        BoardColumn column = columnRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Column Not Found", 404));
+        ColumnDto columnDto = objectMapper.convertValue(column, ColumnDto.class);
+        ArrayList<Cards> cards = cardRepository.findByColumnId(id);
+        ArrayList<CardDto> cardDtos = new ArrayList<>();
+        for (Cards card : cards) {
+            CardDto cardDto = objectMapper.convertValue(card, CardDto.class);
+            cardDto.setColumnId(id);
+            cardDtos.add(cardDto);
+        }
+        columnDto.setCards(cardDtos);
         return columnDto;
     }
 

@@ -3,6 +3,7 @@ package com.fsoft.dto;
 import lombok.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -16,4 +17,5 @@ public class ColumnDto {
     private Date createdAt;
     private String comment;
     private UUID boardId;
+    private ArrayList<CardDto> cards;
 }

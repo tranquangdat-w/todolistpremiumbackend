@@ -38,16 +38,22 @@ public class CardCommentServiceImpl implements CardCommentService {
         ArrayList<CardComment> cardComments = cardCommentRepository.findByCardsCardId(cardId);
         ArrayList<CardCommentDto> cardCommentDtos = new ArrayList<>();
         for (CardComment cardComment : cardComments) {
-            CardCommentDto dto = objectMapper.convertValue(cardComment, CardCommentDto.class);
-            dto.setCardId(cardComment.getCards().getCardId());
+            CardCommentDto dto = new CardCommentDto();
+
+            dto.setId(cardComment.getId());
+            dto.setContent(cardComment.getContent());
+            dto.setCreatedAt(cardComment.getCreatedAt());
+            dto.setUserAvatarUrl(cardComment.getUserAvatarUrl());
             dto.setUserId(cardComment.getUser().getId());
+            dto.setCardId(cardComment.getCards().getCardId());
+            cardCommentDtos.add(dto);
         }
         return cardCommentDtos;
     }
 
     @Override
     public CardCommentDto addCardComment(CardCommentRegistrationRequest request) {
-        User user = userRepository.findById(request.getCardId())
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ApiException("user not found"));
         Cards card = cardRepository.findById(request.getCardId())
                 .orElseThrow(() -> new ApiException("card not found"));
@@ -55,7 +61,16 @@ public class CardCommentServiceImpl implements CardCommentService {
         newCardComment.setUser(user);
         newCardComment.setCards(card);
         cardCommentRepository.save(newCardComment);
-        return objectMapper.convertValue(newCardComment, CardCommentDto.class);
+
+        CardCommentDto cardComment = new CardCommentDto();
+        cardComment.setId(newCardComment.getId());
+        cardComment.setUserId(user.getId());
+        cardComment.setUserId(user.getId());
+        cardComment.setUserAvatarUrl(newCardComment.getUserAvatarUrl());
+        cardComment.setContent(request.getContent());
+        cardComment.setCreatedAt(newCardComment.getCreatedAt());
+
+        return cardComment;
     }
 
     @Override
@@ -69,14 +84,26 @@ public class CardCommentServiceImpl implements CardCommentService {
     }
 
     @Override
-    public CardCommentDto updateCardComment(CardCommentUpdateRequest cardCommentUpdateRequest, UUID userId, UUID cardCommentId) {
+    public CardCommentDto updateCardComment(CardCommentUpdateRequest cardCommentUpdateRequest,
+                                            UUID userId,
+                                            UUID cardCommentId) {
+        System.out.println("Card comment id: " + cardCommentId);
         CardComment cardComment = cardCommentRepository.findById(cardCommentId)
-                .orElseThrow(() -> new ApiException("Card comment not found"));
+                .orElseThrow(() -> new ApiException("Card comment not found", 404));
+
         if (!cardComment.getUser().getId().equals(userId)) {
             throw new ApiException("user is not authorized");
         }
+
         cardComment.setContent(cardCommentUpdateRequest.getContent());
         cardCommentRepository.save(cardComment);
-        return objectMapper.convertValue(cardComment, CardCommentDto.class);
+
+        CardCommentDto dto = new CardCommentDto();
+        dto.setId(cardComment.getId());
+        dto.setUserId(cardComment.getUser().getId());
+        dto.setUserAvatarUrl(cardComment.getUserAvatarUrl());
+        dto.setContent(cardComment.getContent());
+        dto.setCreatedAt(cardComment.getCreatedAt());
+        return dto;
     }
 }

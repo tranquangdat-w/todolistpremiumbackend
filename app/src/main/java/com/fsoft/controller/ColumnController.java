@@ -36,6 +36,12 @@ public class ColumnController {
         return new ResponseEntity<>(boardColumn, HttpStatus.OK);
     }
 
+    @GetMapping("/{columnId}")
+    public ResponseEntity<ColumnDto> getColumn(@PathVariable("columnId") String columnId) {
+        ColumnDto columnDto = columnService.getColumnById(columnId);
+        return new ResponseEntity<>(columnDto, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{columnId}")
     public ResponseEntity<Void> deleteColumn(@PathVariable String columnId, @AuthenticationPrincipal JwtPayload user) {
         columnService.deleteColumn(columnId, user.getId());

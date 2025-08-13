@@ -1,7 +1,10 @@
 package com.fsoft.controller;
 
+import com.fsoft.dto.CardDto;
+import com.fsoft.dto.CardUploadDto;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.CardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +18,12 @@ import java.util.UUID;
 @RequestMapping("/cards")
 public class CardController {
   private final CardService cardService;
+
+  @PostMapping("")
+  public ResponseEntity<CardDto> addCard(@RequestBody @Valid CardUploadDto request) {
+    CardDto response = cardService.addCard(request);
+    return ResponseEntity.ok(response);
+  }
 
   @DeleteMapping("/{cardId}")
   public ResponseEntity<Map<String, String>> deleteCard(

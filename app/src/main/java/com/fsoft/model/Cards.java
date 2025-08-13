@@ -2,18 +2,24 @@ package com.fsoft.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
 @Data
 @Table(name = "cards")
+@ToString
 public class Cards {
   @Id
-  @Column(name = "id")
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @Column(name = "card_id")
   private UUID cardId;
 
-  @Column(name = "title", nullable = false)
+  @Column(name = "task_title", nullable = false)
   private String taskTitle;
 
   @Column(name = "description")
@@ -30,5 +36,5 @@ public class Cards {
 
   @ManyToOne
   @JoinColumn(name = "column_id", nullable = false)
-  private Columns column;
+  private BoardColumn column;
 }

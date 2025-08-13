@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 @Entity
@@ -16,12 +16,12 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CardComment {
-    @Id
-    @GeneratedValue()
+    @Id()
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne()
-    @JoinColumn(name = "card_id", referencedColumnName = "id")
+    @JoinColumn(name = "card_id", referencedColumnName = "card_id")
     @NotNull
     private Cards cards;
     @ManyToOne()

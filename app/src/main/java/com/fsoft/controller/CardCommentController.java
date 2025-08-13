@@ -44,7 +44,7 @@ public class CardCommentController {
 
     @PutMapping("/{cardCommentId}")
     public ResponseEntity<CardCommentDto> updateCardComment(@PathVariable UUID cardCommentId, @RequestBody @Valid CardCommentUpdateRequest request, @AuthenticationPrincipal JwtPayload user) {
-        CardCommentDto cardCommentDto = cardCommentService.updateCardComment(request, cardCommentId, user.getId());
+        CardCommentDto cardCommentDto = cardCommentService.updateCardComment(request, user.getId(), cardCommentId);
         return ResponseEntity.status(HttpStatus.OK).body(cardCommentDto);
     }
 }

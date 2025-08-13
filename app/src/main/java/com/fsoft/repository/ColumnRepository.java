@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ColumnRepository extends JpaRepository<BoardColumn, String> {
+
     ArrayList<BoardColumn> findByBoardId(UUID boardId);
 
     Optional<BoardColumn> findById(String id);

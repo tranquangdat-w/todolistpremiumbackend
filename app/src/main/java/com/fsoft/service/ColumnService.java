@@ -13,6 +13,8 @@ public interface ColumnService {
                                   Date createdAt,
                                   UUID boardId);
 
+    public ColumnDto getColumnById(String id);
+
     public void deleteColumn(String id,
                              UUID userId);
 
