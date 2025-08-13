@@ -32,7 +32,7 @@ public class InvitationController {
         try {
             // Handle case when user is null - user not authenticated
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.OK).body(List.of()); // Return empty list with status 200 instead of 403
+                return ResponseEntity.status(HttpStatus.OK).body(List.of());
             }
 
             UUID userId = user.getId();
