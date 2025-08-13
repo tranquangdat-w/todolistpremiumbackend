@@ -1,9 +1,11 @@
 package com.fsoft.controller;
 
 import com.fsoft.dto.NotificationResponseDto;
+import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -16,8 +18,9 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<NotificationResponseDto> getUserNotifications(@RequestParam UUID userId) {
+    public ResponseEntity<NotificationResponseDto> getUserNotifications(@AuthenticationPrincipal JwtPayload jwtPayload) {
         try {
+            UUID userId = jwtPayload.getId();
             NotificationResponseDto notifications = notificationService.getUserNotifications(userId);
             return ResponseEntity.ok(notifications);
         } catch (Exception e) {
@@ -38,8 +41,9 @@ public class NotificationController {
     }
 
     @PutMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@RequestParam UUID userId) {
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal JwtPayload jwtPayload) {
         try {
+            UUID userId = jwtPayload.getId();
             notificationService.markAllAsRead(userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
