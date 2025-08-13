@@ -27,6 +27,9 @@ public class InvitationController {
 
     @GetMapping
     public ResponseEntity<List<InvitationDto>> getUserInvitations(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(null);
+        }
         return ResponseEntity.ok(invitationService.getUserInvitations(user.getId()));
     }
 
