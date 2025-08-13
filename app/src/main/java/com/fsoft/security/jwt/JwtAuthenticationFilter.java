@@ -40,7 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       "/users/login",
       "/users/verify",
       "/users/logout",
-      "/v3/api-docs",
+      "/v3/api-docs/**",
+      "/swagger-ui",
+      "/swagger-ui.html",
+      "/swagger-ui/index.html",
+      "/swagger-ui/**",
       "/users/refresh_token");
 
   @Override
