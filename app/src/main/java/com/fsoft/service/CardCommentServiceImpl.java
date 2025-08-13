@@ -60,6 +60,7 @@ public class CardCommentServiceImpl implements CardCommentService {
         CardComment newCardComment = objectMapper.convertValue(request, CardComment.class);
         newCardComment.setUser(user);
         newCardComment.setCards(card);
+        newCardComment.setUserAvatarUrl(user.getAvatar());
         cardCommentRepository.save(newCardComment);
 
         CardCommentDto cardComment = new CardCommentDto();

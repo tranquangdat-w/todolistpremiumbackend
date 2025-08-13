@@ -17,7 +17,7 @@ import java.util.UUID;
 @Table(name="columns")
 public class BoardColumn {
     @Id
-    @Column(name = "column_id")
+    @Column(name = "id")
     private String id;
 
     @Column(name = "title")

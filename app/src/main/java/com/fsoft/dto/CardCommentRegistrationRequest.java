@@ -16,8 +16,6 @@ public class CardCommentRegistrationRequest {
     private UUID cardId;
     @NotNull(message = "user id cannot be null")
     private UUID userId;
-    @NotNull(message = "user avatar cannot be null")
-    private String userAvatarUrl;
     @NotNull(message = "content cannot be null")
     private String content;
     @NotNull(message = "created date cannot be null")

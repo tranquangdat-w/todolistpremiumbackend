@@ -21,7 +21,7 @@ public class CardComment {
     private UUID id;
 
     @ManyToOne()
-    @JoinColumn(name = "card_id", referencedColumnName = "card_id")
+    @JoinColumn(name = "card_id", referencedColumnName = "id")
     @NotNull
     private Cards cards;
     @ManyToOne()

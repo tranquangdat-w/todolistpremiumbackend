@@ -16,7 +16,7 @@ public class Cards {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-  @Column(name = "card_id")
+  @Column(name = "id")
   private UUID cardId;
 
   @Column(name = "task_title", nullable = false)
