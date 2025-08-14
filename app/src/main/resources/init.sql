@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS columns (
   title VARCHAR(255) NOT NULL,
   created_at DATE NOT NULL,
   board_id UUID NOT NULL,
+  position DECIMAL(12, 6) NOT NULL,
   CONSTRAINT fk_columns_board FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS cards (
   is_done BOOLEAN NOT NULL DEFAULT FALSE,
   created_at DATE NOT NULL,
   deadline TIMESTAMP,
+  position DECIMAL(12, 6) NOT NULL,
   column_id UUID NOT NULL,
   CONSTRAINT fk_cards_column FOREIGN KEY (column_id) REFERENCES columns(id) ON DELETE CASCADE
 );
@@ -61,7 +63,7 @@ CREATE TABLE IF NOT EXISTS card_comments (
   CONSTRAINT fk_card_comments_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS invitation (
+CREATE TABLE IF NOT EXISTS invitations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   board_id UUID NOT NULL,
   invited_user_id UUID NOT NULL,

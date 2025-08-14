@@ -1,6 +1,8 @@
 package com.fsoft.model;
 
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -10,14 +12,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
 
 @Entity
 @Data
 @Table(name = "cards")
 public class Card {
   @Id
+  @GeneratedValue
   @Column(name = "id")
-  private UUID cardId;
+  private UUID id;
 
   @Column(name = "title", nullable = false)
   private String title;
@@ -33,6 +37,9 @@ public class Card {
 
   @Column(name = "deadline")
   private Date deadline;
+
+  @Column(name = "position", nullable = false)
+  private BigDecimal position;
 
   @ManyToOne
   @JoinColumn(name = "column_id", nullable = false)

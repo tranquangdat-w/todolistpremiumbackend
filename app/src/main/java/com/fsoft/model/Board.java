@@ -1,6 +1,8 @@
 package com.fsoft.model;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -8,7 +10,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,16 +37,22 @@ public class Board {
   @Column(name = "id")
   private UUID id;
 
-  @NotNull
   @Column(name = "title")
   private String title;
+
+  @ManyToMany
+  @JoinTable(name = "board_members", joinColumns = @JoinColumn(name = "board_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+  private Set<User> members;
 
   @Column(name = "description")
   private String description;
 
   @ManyToOne
   @JoinColumn(name = "owner_id")
-  private User user;
+  private User owner;
+
+  @OneToMany(mappedBy = "board")
+  private List<Columnn> columns;
 
   @NotNull
   @Column(name = "created_at")

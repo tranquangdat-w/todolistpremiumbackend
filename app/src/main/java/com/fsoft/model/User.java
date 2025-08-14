@@ -1,6 +1,7 @@
 package com.fsoft.model;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -9,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -59,7 +61,7 @@ public class User {
   @Column(name = "verify_token")
   private String verifyToken;
 
-  @Column(name = "avatar")
+  @Column(name = "avatar", columnDefinition = "text")
   private String avatar;
 
   @NotNull
@@ -68,4 +70,7 @@ public class User {
 
   @Column(name = "otp")
   private String otp;
+
+  @ManyToMany(mappedBy = "members")
+  private Set<Board> boards;
 }

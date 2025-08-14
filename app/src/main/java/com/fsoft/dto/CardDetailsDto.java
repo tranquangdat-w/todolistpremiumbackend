@@ -1,0 +1,17 @@
+package com.fsoft.dto;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.UUID;
+
+import lombok.Data;
+
+@Data
+public class CardDetailsDto {
+  private UUID id;
+  private String title;
+  private Boolean isDone;
+  private Date createdAt;
+  private Date deadline;
+  private BigDecimal position;
+}

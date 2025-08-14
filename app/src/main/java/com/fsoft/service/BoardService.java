@@ -1,5 +1,6 @@
 package com.fsoft.service;
 
+import com.fsoft.dto.BoardDetailsDto;
 import com.fsoft.dto.BoardDto;
 import com.fsoft.dto.CreateBoardDto;
 import com.fsoft.dto.UpdateBoardDto;
@@ -28,7 +29,6 @@ public class BoardService {
   @Transactional
   public void createBoard(UUID userId, CreateBoardDto createBoardDto) {
     Board board = new Board();
-
     User user = new User();
     user.setId(userId);
 
@@ -37,7 +37,7 @@ public class BoardService {
     }
 
     board.setTitle(createBoardDto.getTitle());
-    board.setUser(user);
+    board.setOwner(user);
     board.setCreatedAt(LocalDate.now());
 
     boardRepository.save(board);
@@ -45,12 +45,8 @@ public class BoardService {
 
   @Transactional
   public void updateBoard(UUID boardId, UUID userId, UpdateBoardDto updateBoardDto) {
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
-
-    if (!board.getUser().getId().equals(userId)) {
-      throw new ApiException("You don't have permission to update this board", HttpStatus.FORBIDDEN.value());
-    }
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
 
     if (updateBoardDto.getTitle() != null) {
       board.setTitle(updateBoardDto.getTitle());
@@ -65,28 +61,38 @@ public class BoardService {
 
   @Transactional
   public void deleteBoard(UUID boardId, UUID userId) {
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+    Board board = checkBoardExist(boardId);
 
-    if (!board.getUser().getId().equals(userId)) {
+    if (!board.getOwner().getId().equals(userId)) {
       throw new ApiException("You don't have permission to delete this board", HttpStatus.FORBIDDEN.value());
     }
 
     boardRepository.delete(board);
   }
 
-  public BoardDto getBoardDetail(UUID boardId, UUID userId) {
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+  public BoardDetailsDto getBoardDetail(UUID boardId, UUID userId) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
 
-    if (!board.getUser().getId().equals(userId)) {
-      throw new ApiException("You don't have permission to view this board", HttpStatus.FORBIDDEN.value());
-    }
-
-    return BoardMapper.toBoardDto(board);
+    return BoardMapper.toBoardDetailsDto(board);
   }
 
   public Page<BoardDto> getBoardsByUserId(UUID userId, Pageable pageable) {
-    return boardRepository.findByUser_Id(userId, pageable).map(BoardMapper::toBoardDto);
+    return boardRepository
+        .findByOwnerOrMember(userId, pageable)
+        .map(BoardMapper::toBoardDto);
+  }
+
+  private Board checkBoardExist(UUID boardId) {
+    return boardRepository.findById(boardId)
+        .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+  }
+
+  private void checkPermisstionOfUser(Board board, UUID userId) {
+    if (!board.getOwner().getId().equals(userId)
+        && !board.getMembers().stream().anyMatch(member -> member.getId().equals(userId))) {
+      throw new ApiException("You don't have permission to view this board",
+          HttpStatus.FORBIDDEN.value());
+    }
   }
 }
