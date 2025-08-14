@@ -37,7 +37,7 @@ public class Notification {
     @JdbcTypeCode(SqlTypes.JSON)
     private String data;
 
-    @Column(name = "is_read", nullable = false)
+    @Column(name = "isread", nullable = false)
     private boolean isRead = false;
 
     @Column(name = "createdat", nullable = false)
