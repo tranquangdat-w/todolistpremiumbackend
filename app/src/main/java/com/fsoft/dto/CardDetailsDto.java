@@ -14,4 +14,5 @@ public class CardDetailsDto {
   private Date createdAt;
   private Date deadline;
   private BigDecimal position;
+  private String cover;
 }

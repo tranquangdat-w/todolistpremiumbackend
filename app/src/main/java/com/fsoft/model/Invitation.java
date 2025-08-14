@@ -23,28 +23,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "invitations")
 public class Invitation {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Boards board;
+  @ManyToOne
+  @JoinColumn(name = "board_id")
+  private Board board;
 
-    @ManyToOne
-    @JoinColumn(name = "invited_user_id")
-    private User invitedUser;
+  @ManyToOne
+  @JoinColumn(name = "invited_user_id")
+  private User invitedUser;
 
-    @ManyToOne
-    @JoinColumn(name = "inviter_user_id")
-    private User inviterUser;
+  @ManyToOne
+  @JoinColumn(name = "inviter_user_id")
+  private User inviterUser;
 
-    @Column(name = "status")
-    private String status;
+  @Column(name = "status")
+  private String status;
 
-    @Column(name = "sent_at")
-    private LocalDateTime sentAt;
+  @Column(name = "sent_at")
+  private LocalDateTime sentAt;
 
-    @Column(name = "responded_at")
-    private LocalDateTime respondedAt;
+  @Column(name = "responded_at")
+  private LocalDateTime respondedAt;
 }

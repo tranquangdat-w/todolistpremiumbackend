@@ -4,8 +4,6 @@ import com.fsoft.dto.BoardDetailsDto;
 import com.fsoft.dto.BoardDto;
 import com.fsoft.dto.CreateBoardDto;
 import com.fsoft.dto.UpdateBoardDto;
-import com.fsoft.model.Board;
-import com.fsoft.projection.BoardSumary;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.BoardService;
 

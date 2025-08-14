@@ -3,14 +3,20 @@ package com.fsoft.mapper;
 import com.fsoft.dto.BoardDetailsDto;
 import com.fsoft.dto.BoardDto;
 import com.fsoft.model.Board;
-import com.fsoft.mapper.UserMapper;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class BoardMapper {
+  private BoardMapper() {
+  }
+
   public static BoardDto toBoardDto(Board board) {
+    if (board == null) {
+      return null;
+    }
+
     BoardDto boardDto = new BoardDto();
     boardDto.setId(board.getId());
     boardDto.setTitle(board.getTitle());
@@ -20,6 +26,10 @@ public class BoardMapper {
   }
 
   public static BoardDetailsDto toBoardDetailsDto(Board board) {
+    if (board == null) {
+      return null;
+    }
+
     BoardDetailsDto boardDetailsDto = new BoardDetailsDto();
     boardDetailsDto.setId(board.getId());
     boardDetailsDto.setTitle(board.getTitle());

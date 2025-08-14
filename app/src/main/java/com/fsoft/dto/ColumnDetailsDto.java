@@ -14,5 +14,4 @@ public class ColumnDetailsDto {
   private Date createdAt;
   private BigDecimal position;
   private List<CardDetailsDto> cards;
-
 }

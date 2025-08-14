@@ -29,6 +29,9 @@ public class Card {
   @Column(name = "description")
   private String description;
 
+  @Column(name = "cover")
+  private String cover;
+
   @Column(name = "is_done")
   private Boolean isDone;
 
