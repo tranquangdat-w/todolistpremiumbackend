@@ -40,7 +40,7 @@ public class Invitation {
     private User inviterUser;
 
     @Column(name = "status")
-    private String status;
+    private String status = "PENDING";
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;

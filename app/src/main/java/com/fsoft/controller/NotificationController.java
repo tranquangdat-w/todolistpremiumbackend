@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.fsoft.dto.NotificationDto;
+import com.fsoft.model.Notification;
 
 import java.util.UUID;
 
@@ -46,6 +48,20 @@ public class NotificationController {
             UUID userId = jwtPayload.getId();
             notificationService.markAllAsRead(userId);
             return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<Notification> createNotification(
+            @AuthenticationPrincipal JwtPayload jwtPayload,
+            @RequestBody NotificationDto notificationDto) {
+        try {
+            UUID userId = jwtPayload.getId();
+            Notification notification = notificationService.createNotification(userId, notificationDto);
+            return ResponseEntity.ok(notification);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

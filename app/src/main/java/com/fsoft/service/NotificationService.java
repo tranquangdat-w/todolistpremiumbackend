@@ -95,4 +95,16 @@ public class NotificationService {
 
         notificationRepository.save(notification);
     }
+
+    public Notification createNotification(UUID userId, NotificationDto notificationDto) {
+        Notification notification = Notification.builder()
+                .userId(userId)
+                .type(notificationDto.getType())
+                .note(notificationDto.getNote())
+                .data(notificationDto.getData())
+                .isRead(false)
+                .build();
+
+        return notificationRepository.save(notification);
+    }
 }

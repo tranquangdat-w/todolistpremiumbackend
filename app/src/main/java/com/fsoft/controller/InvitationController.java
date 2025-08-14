@@ -15,27 +15,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fsoft.dto.InvitationDto;
-import com.fsoft.model.User;
+import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.InvitationService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/invitations")
+@RequestMapping("/api/invitations")
 @RequiredArgsConstructor
 public class InvitationController {
 
     private final InvitationService invitationService;
 
     @GetMapping
-    public ResponseEntity<List<InvitationDto>> getUserInvitations(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<InvitationDto>> getUserInvitations(@AuthenticationPrincipal JwtPayload jwtPayload) {
         try {
             // Handle case when user is null - user not authenticated
-            if (user == null) {
+            if (jwtPayload == null) {
                 return ResponseEntity.status(HttpStatus.OK).body(List.of());
             }
 
-            UUID userId = user.getId();
+            UUID userId = jwtPayload.getId();
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.OK).body(List.of());
             }
