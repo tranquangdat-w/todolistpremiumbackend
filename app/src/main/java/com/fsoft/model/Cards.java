@@ -15,11 +15,10 @@ import java.util.UUID;
 public class Cards {
   @Id
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
   @Column(name = "id")
   private UUID cardId;
 
-  @Column(name = "task_title", nullable = false)
+  @Column(name = "title", nullable = false)
   private String taskTitle;
 
   @Column(name = "description")

@@ -15,9 +15,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Table(name = "card_comments")
 public class CardComment {
     @Id()
     @GeneratedValue
+    @Column(name = "id")
     private UUID id;
 
     @ManyToOne()
