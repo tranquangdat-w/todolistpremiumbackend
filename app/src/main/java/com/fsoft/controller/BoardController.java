@@ -3,12 +3,15 @@ package com.fsoft.controller;
 import com.fsoft.dto.BoardDto;
 import com.fsoft.dto.CreateBoardDto;
 import com.fsoft.dto.UpdateBoardDto;
+import com.fsoft.model.Boards;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.BoardService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -71,5 +74,18 @@ public class BoardController {
         UUID userId = jwtPayload.getId();
         Page<BoardDto> page = boardService.getBoardsByUserId(userId, pageable);
         return ResponseEntity.ok(new PageDto<>(page));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> getBoardByKeyword(
+            @AuthenticationPrincipal JwtPayload jwtPayload,
+            @RequestParam(required = false) String search) {
+
+        UUID ownerId = jwtPayload.getId(); // Lấy từ token
+        List<Boards> boards = boardService.searchBoardByKeyword(ownerId, search);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", boards);
+        response.put("status", "success");
+        return ResponseEntity.ok(response);
     }
 }

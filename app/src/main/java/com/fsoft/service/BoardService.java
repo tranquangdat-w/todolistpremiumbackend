@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -88,5 +90,12 @@ public class BoardService {
 
     public Page<BoardDto> getBoardsByUserId(UUID userId, Pageable pageable) {
         return boardRepository.findByUser_Id(userId, pageable).map(BoardMapper::toBoardDto);
+    }
+
+    public List<Boards> searchBoardByKeyword(UUID owner_id, String keyword) {
+        if (keyword.isBlank()) {
+            return Collections.emptyList();
+        }
+        return boardRepository.findByBoardNameContaining(owner_id, keyword);
     }
 }
