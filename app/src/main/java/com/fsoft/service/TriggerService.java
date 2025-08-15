@@ -184,7 +184,6 @@ public class TriggerService {
             log.info("Updating card positions for column: {}", columnId);
 
             // Logic để update positions - có thể parse JSON và update từng card
-            // Đây là ví dụ đơn giản, bạn có thể mở rộng theo nhu cầu
             String updateSql = """
                 UPDATE cards 
                 SET position = position + 1 
