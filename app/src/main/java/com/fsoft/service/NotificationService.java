@@ -3,11 +3,13 @@ package com.fsoft.service;
 import com.fsoft.dto.*;
 import com.fsoft.model.Notification;
 import com.fsoft.model.NotificationType;
+import com.fsoft.model.User;
 import com.fsoft.repository.NotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +36,7 @@ public class NotificationService {
                         InvitationNotificationDto invitationDto = objectMapper.readValue(
                                 notification.getData(), InvitationNotificationDto.class);
                         invitationDto.setId(notification.getId());
-                        invitationDto.setRead(notification.isRead());
+                        invitationDto.setRead(notification.getIsRead());
                         invitationNotifications.add(invitationDto);
                         break;
 
@@ -42,7 +44,7 @@ public class NotificationService {
                         AcceptedNotificationDto acceptedDto = objectMapper.readValue(
                                 notification.getData(), AcceptedNotificationDto.class);
                         acceptedDto.setId(notification.getId());
-                        acceptedDto.setRead(notification.isRead());
+                        acceptedDto.setRead(notification.getIsRead());
                         acceptedNotifications.add(acceptedDto);
                         break;
 
@@ -50,7 +52,7 @@ public class NotificationService {
                         RejectedNotificationDto rejectedDto = objectMapper.readValue(
                                 notification.getData(), RejectedNotificationDto.class);
                         rejectedDto.setId(notification.getId());
-                        rejectedDto.setRead(notification.isRead());
+                        rejectedDto.setRead(notification.getIsRead());
                         rejectedNotifications.add(rejectedDto);
                         break;
 
@@ -58,7 +60,7 @@ public class NotificationService {
                         CommentNotificationDto commentDto = objectMapper.readValue(
                                 notification.getData(), CommentNotificationDto.class);
                         commentDto.setId(notification.getId());
-                        commentDto.setRead(notification.isRead());
+                        commentDto.setRead(notification.getIsRead());
                         commentNotifications.add(commentDto);
                         break;
                 }
@@ -85,24 +87,32 @@ public class NotificationService {
     }
 
     public void createNotification(UUID userId, NotificationType type, String note, String data) {
+        User user = new User();
+        user.setId(userId);
+
         Notification notification = Notification.builder()
-                .userId(userId)
+                .user(user)
                 .type(type)
                 .note(note)
                 .data(data)
                 .isRead(false)
+                .createdAt(LocalDateTime.now()) // Fix: Explicitly set createdAt to avoid null constraint violation
                 .build();
 
         notificationRepository.save(notification);
     }
 
     public Notification createNotification(UUID userId, NotificationDto notificationDto) {
+        User user = new User();
+        user.setId(userId);
+
         Notification notification = Notification.builder()
-                .userId(userId)
+                .user(user)
                 .type(notificationDto.getType())
                 .note(notificationDto.getNote())
                 .data(notificationDto.getData())
                 .isRead(false)
+                .createdAt(LocalDateTime.now()) // Fix: Add missing createdAt to prevent null constraint violation
                 .build();
 
         return notificationRepository.save(notification);

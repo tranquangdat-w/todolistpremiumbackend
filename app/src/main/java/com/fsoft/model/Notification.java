@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "notifications")
+@EntityListeners(AuditingEntityListener.class)
 public class Notification {
 
     @Id
@@ -53,7 +56,7 @@ public class Notification {
     private Boolean isRead = false;
 
     @NotNull
-    @Builder.Default
-    @Column(name = "createdat")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(name = "createdat", nullable = false)
+    private LocalDateTime createdAt;
 }
