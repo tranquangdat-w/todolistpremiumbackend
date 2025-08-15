@@ -10,4 +10,6 @@ public class BoardDto {
   private String title;
   private String description;
   private LocalDate createdAt;
+  private UserDto owner;
+  private UserDto user;
 }

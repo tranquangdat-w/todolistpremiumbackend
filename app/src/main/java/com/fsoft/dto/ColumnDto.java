@@ -1,8 +1,8 @@
 package com.fsoft.dto;
 
 import lombok.*;
-
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -10,10 +10,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ColumnDto {
-    private String id;
+    private UUID id;
     private String title;
     private String description;
-    private Date createdAt;
-    private String comment;
+    private LocalDate createdAt;
+    private BigDecimal position;
     private UUID boardId;
 }

@@ -1,45 +1,59 @@
 package com.fsoft.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "notifications")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "notifications")
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
+    @Column(name = "id")
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "type", nullable = false)
+    @NotNull
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
-    @Column(name = "note", nullable = false)
+    @NotNull
+    @Column(name = "note")
     private String note;
 
     @Column(name = "data")
     @JdbcTypeCode(SqlTypes.JSON)
     private String data;
 
-    @Column(name = "isread", nullable = false)
-    private boolean isRead = false;
+    @NotNull
+    @Builder.Default
+    @Column(name = "isread")
+    private Boolean isRead = false;
 
-    @Column(name = "createdat", nullable = false)
+    @NotNull
+    @Builder.Default
+    @Column(name = "createdat")
     private LocalDateTime createdAt = LocalDateTime.now();
 }

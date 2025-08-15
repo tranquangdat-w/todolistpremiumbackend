@@ -39,11 +39,16 @@ public class Boards {
   @Column(name = "description")
   private String description;
 
+  @NotNull
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "owner_id")
+  private User owner;
 
   @NotNull
   @Column(name = "created_at")
   private LocalDate createdAt;
+
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
 }

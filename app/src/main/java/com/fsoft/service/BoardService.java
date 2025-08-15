@@ -29,15 +29,16 @@ public class BoardService {
     public void createBoard(UUID userId, CreateBoardDto createBoardDto) {
         Boards board = new Boards();
 
-        User user = new User();
-        user.setId(userId);
+        User owner = new User();
+        owner.setId(userId);
 
         if (createBoardDto.getDescription() != null) {
             board.setDescription(createBoardDto.getDescription());
         }
 
         board.setTitle(createBoardDto.getTitle());
-        board.setUser(user);
+        board.setOwner(owner);
+        board.setUser(owner); // Initially, owner is also the user
         board.setCreatedAt(LocalDate.now());
 
         boardRepository.save(board);
@@ -48,7 +49,7 @@ public class BoardService {
         Boards board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
 
-        if (!board.getUser().getId().equals(userId)) {
+        if (!board.getOwner().getId().equals(userId)) {
             throw new ApiException("You don't have permission to update this board", HttpStatus.FORBIDDEN.value());
         }
 
@@ -68,7 +69,7 @@ public class BoardService {
         Boards board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
 
-        if (!board.getUser().getId().equals(userId)) {
+        if (!board.getOwner().getId().equals(userId)) {
             throw new ApiException("You don't have permission to delete this board", HttpStatus.FORBIDDEN.value());
         }
 
@@ -79,7 +80,7 @@ public class BoardService {
         Boards board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
 
-        if (!board.getUser().getId().equals(userId)) {
+        if (!board.getOwner().getId().equals(userId)) {
             throw new ApiException("You don't have permission to view this board", HttpStatus.FORBIDDEN.value());
         }
 
@@ -87,6 +88,6 @@ public class BoardService {
     }
 
     public Page<BoardDto> getBoardsByUserId(UUID userId, Pageable pageable) {
-        return boardRepository.findByUser_Id(userId, pageable).map(BoardMapper::toBoardDto);
+        return boardRepository.findByOwner_Id(userId, pageable).map(BoardMapper::toBoardDto);
     }
 }

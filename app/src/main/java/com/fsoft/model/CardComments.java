@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -19,8 +18,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "columns")
-public class Columns {
+@Table(name = "card_comments")
+public class CardComments {
 
     @Id
     @GeneratedValue
@@ -28,22 +27,23 @@ public class Columns {
     private UUID id;
 
     @NotNull
-    @Column(name = "title")
-    private String title;
-
-    @NotNull
-    @Column(name = "created_at")
-    private LocalDate createdAt;
+    @ManyToOne
+    @JoinColumn(name = "card_id")
+    private Cards card;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Boards board;
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "user_avatar_url", columnDefinition = "text")
+    private String userAvatarUrl;
 
     @NotNull
-    @Column(name = "position")
-    private BigDecimal position;
+    @Column(name = "content", columnDefinition = "text")
+    private String content;
 
-    @Column(name = "description")
-    private String description;
+    @NotNull
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }
