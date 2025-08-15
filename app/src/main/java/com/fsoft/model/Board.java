@@ -47,6 +47,7 @@ public class Board {
   @Column(name = "description")
   private String description;
 
+  @NotNull
   @ManyToOne
   @JoinColumn(name = "owner_id")
   private User owner;
