@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fsoft.dto.InvitationDto;
-import com.fsoft.model.User;
+import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.InvitationService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,18 +23,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InvitationController {
 
-    private final InvitationService invitationService;
+  private final InvitationService invitationService;
 
-    @GetMapping
-    public ResponseEntity<List<InvitationDto>> getUserInvitations(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(invitationService.getUserInvitations(user.getId()));
-    }
+  @GetMapping
+  public ResponseEntity<List<InvitationDto>> getUserInvitations(
+      @AuthenticationPrincipal JwtPayload playLoad) {
+    return ResponseEntity.ok(invitationService.getUserInvitations(playLoad.getId()));
+  }
 
-    @PutMapping("/{invitationId}")
-    public ResponseEntity<Void> updateInvitationStatus(
-            @PathVariable UUID invitationId,
-            @RequestParam String status) {
-        invitationService.updateInvitationStatus(invitationId, status);
-        return ResponseEntity.ok().build();
-    }
+  @PutMapping("/{invitationId}")
+  public ResponseEntity<Void> updateInvitationStatus(
+      @PathVariable UUID invitationId,
+      @RequestParam String status) {
+    invitationService.updateInvitationStatus(invitationId, status);
+    return ResponseEntity.ok().build();
+  }
 }

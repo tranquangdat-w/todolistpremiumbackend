@@ -1,6 +1,7 @@
 package com.fsoft.dto;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,7 +13,9 @@ public class CardDetailsDto {
   private String title;
   private Boolean isDone;
   private Date createdAt;
-  private Date deadline;
+  private Instant deadline;
   private BigDecimal position;
   private String cover;
+  private UUID columnId;
+  private String description;
 }

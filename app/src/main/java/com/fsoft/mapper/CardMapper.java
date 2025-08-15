@@ -20,6 +20,8 @@ public class CardMapper {
     cardDetailsDto.setDeadline(card.getDeadline());
     cardDetailsDto.setPosition(card.getPosition());
     cardDetailsDto.setCover(card.getCover());
+    cardDetailsDto.setDescription(card.getDescription());
+    cardDetailsDto.setColumnId(card.getColumn().getId());
     return cardDetailsDto;
   }
 }

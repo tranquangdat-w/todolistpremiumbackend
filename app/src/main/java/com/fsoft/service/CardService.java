@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class CardService {
   private final CardRepository cardRepository;
   private final BoardRepository boardRepository;
+  private final DropboxService dropboxService;
 
   @Transactional
   public CardDetailsDto createCard(UUID userId, CreateCardRequest request) {
@@ -50,7 +52,7 @@ public class CardService {
   }
 
   @Transactional
-  public void updateCard(UUID userId, UUID cardId, CardUpdateRequest request) {
+  public CardDetailsDto updateCard(UUID userId, UUID cardId, CardUpdateRequest request) {
     UUID boardId = UUID.fromString(request.getBoardId());
 
     Board board = checkBoardExist(boardId);
@@ -64,6 +66,10 @@ public class CardService {
       card.setColumn(column);
     }
 
+    if (request.getDescription() != null) {
+      card.setDescription(request.getDescription());
+    }
+
     if (request.getTitle() != null) {
       card.setTitle(request.getTitle());
     }
@@ -72,26 +78,39 @@ public class CardService {
       card.setPosition(request.getPosition());
     }
 
+    if (request.getIsDone() != null) {
+      card.setIsDone(request.getIsDone());
+    }
+
+    if (request.getDeadline() != null) {
+      card.setDeadline(request.getDeadline());
+    }
+
     cardRepository.save(card);
+
+    return CardMapper.toCardDetailsDto(card);
   }
 
-  // public void deleteCard(UUID boardId, UUID cardId, UUID userId) {
-  // Board board = boardRepository.findById(boardId)
-  // .orElseThrow(() -> new ApiException("Board not found",
-  // HttpStatus.NOT_FOUND.value()));
-  //
-  // if (!board.getUser().getId().equals(userId)) {
-  // throw new ApiException("You don't have permission to delete this card",
-  // HttpStatus.FORBIDDEN.value());
-  // }
-  //
-  // Card card = cardRepository.findById(cardId)
-  // .orElseThrow(() -> new ApiException("Card not found",
-  // HttpStatus.NOT_FOUND.value()));
-  //
-  // cardRepository.delete(card);
-  // }
-  //
+  @Transactional
+  public void deleteCard(UUID boardId, UUID cardId, UUID userId) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
+
+    Card card = new Card();
+    card.setId(cardId);
+
+    cardRepository.delete(card);
+  }
+
+  public CardDetailsDto getCardDetails(UUID userId, UUID boardId, UUID cardId) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
+
+    Card card = checkCardExist(cardId);
+
+    return CardMapper.toCardDetailsDto(card);
+  }
+
   private Card checkCardExist(UUID cardId) {
     return cardRepository.findById(cardId)
         .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
@@ -119,5 +138,30 @@ public class CardService {
   private Board checkBoardExist(UUID boardId) {
     return boardRepository.findById(boardId)
         .orElseThrow(() -> new ApiException("Board not found", HttpStatus.NOT_FOUND.value()));
+  }
+
+  @Transactional
+  public CardDetailsDto updateCardCover(UUID userId, UUID boardId, UUID cardId, MultipartFile coverFile) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
+
+    Card card = checkCardExist(cardId);
+
+    try {
+      String url = dropboxService
+          .uploadCardCover(coverFile, cardId)
+          .orElseThrow(
+              () -> new ApiException("Some error occur when upload cover"));
+
+      card.setCover(url);
+
+      cardRepository.save(card);
+
+      return CardMapper.toCardDetailsDto(card);
+    } catch (Exception e) {
+      System.out.println(e);
+      e.printStackTrace();
+      throw new ApiException(e.getMessage());
+    }
   }
 }

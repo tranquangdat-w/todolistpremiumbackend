@@ -56,6 +56,21 @@ public class DropboxService {
     }
   }
 
+  public Optional<String> uploadCardCover(
+      MultipartFile cover, UUID cardId) throws IOException, DbxException {
+    DbxClientV2 client = getClient();
+    String path = String.format("/cards/%s", cardId);
+
+    try (InputStream in = cover.getInputStream()) {
+      FileMetadata metadata = client.files()
+          .uploadBuilder(path)
+          .withMode(WriteMode.OVERWRITE)
+          .uploadAndFinish(in);
+
+      return Optional.of(getOrCreateSharedLink(client, metadata.getPathDisplay()));
+    }
+  }
+
   private String getOrCreateSharedLink(DbxClientV2 client, String filePath) throws DbxException {
     // Lấy link cũ nếu đã tồn tại
     ListSharedLinksResult existingLinks = client.sharing()

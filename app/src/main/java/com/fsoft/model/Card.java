@@ -3,6 +3,7 @@ package com.fsoft.model;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class Card {
   private Date createdAt;
 
   @Column(name = "deadline")
-  private Date deadline;
+  private Instant deadline;
 
   @Column(name = "position", nullable = false)
   private BigDecimal position;
