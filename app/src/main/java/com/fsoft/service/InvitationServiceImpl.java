@@ -251,7 +251,7 @@ public class InvitationServiceImpl implements InvitationService {
             rejectedDto.setInvitedUsername(invitation.getInvitedUser().getUsername());
             rejectedDto.setInvitedAvatar(invitation.getInvitedUser().getAvatar());
             rejectedDto.setRespondedAt(invitation.getRespondedAt());
-            rejectedDto.setRead(false);
+            rejectedDto.setIsRead(false);
 
             String jsonData = objectMapper.writeValueAsString(rejectedDto);
 

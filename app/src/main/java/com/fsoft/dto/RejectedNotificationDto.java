@@ -17,5 +17,5 @@ public class RejectedNotificationDto {
     private String invitedUsername;
     private String invitedAvatar;
     private LocalDateTime respondedAt;
-    private boolean read;
+    private boolean isRead;
 }
