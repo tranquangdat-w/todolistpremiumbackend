@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fsoft.dto.CreateInvitationDto;
 import com.fsoft.dto.InvitationDto;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.InvitationService;
@@ -21,7 +23,7 @@ import com.fsoft.service.InvitationService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/invitations")
+@RequestMapping("/invitations")
 @RequiredArgsConstructor
 public class InvitationController {
 
@@ -57,20 +59,29 @@ public class InvitationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/test-create")
-    public ResponseEntity<?> createTestInvitations() {
+    @PostMapping
+    public ResponseEntity<InvitationDto> createInvitation(
+            @RequestBody CreateInvitationDto createInvitationDto,
+            @AuthenticationPrincipal JwtPayload jwtPayload) {
         try {
-            // User ID from request
-            String userId = "99d5bb72-1ada-47b1-93e5-5a83bfa0a041";
+            if (jwtPayload == null || jwtPayload.getId() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-            // Create test invitations
-            invitationService.createTestInvitations(userId);
+            InvitationDto createdInvitation = invitationService.createInvitation(
+                    createInvitationDto.getUsername(),
+                    createInvitationDto.getBoardId(),
+                    jwtPayload.getId()
+            );
 
-            return ResponseEntity.ok("Test invitations created successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdInvitation);
+        } catch (IllegalStateException e) {
+            // Handle case when the invitation already exists
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
+            // Log the exception
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error creating test invitations: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

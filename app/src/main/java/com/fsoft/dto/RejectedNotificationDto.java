@@ -1,15 +1,13 @@
 package com.fsoft.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RejectedNotificationDto {
@@ -19,5 +17,5 @@ public class RejectedNotificationDto {
     private String invitedUsername;
     private String invitedAvatar;
     private LocalDateTime respondedAt;
-    private boolean isRead;
+    private boolean read;
 }
