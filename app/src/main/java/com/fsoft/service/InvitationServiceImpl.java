@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fsoft.dto.InvitationDto;
 import com.fsoft.dto.RejectedNotificationDto;
-import com.fsoft.model.Boards;
+import com.fsoft.model.Board;
 import com.fsoft.model.Invitation;
 import com.fsoft.model.NotificationType;
 import com.fsoft.model.User;
@@ -23,17 +23,23 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+/**
+ * Enhanced InvitationServiceImpl that fixes PostgreSQL parameter binding issues
+ * and adds email/username search capability
+ */
+@Service("invitationServiceImpl")
 @RequiredArgsConstructor
 @Slf4j
-public class InvitationServiceImpl implements InvitationService {
+public class InvitationServiceImpl {
     private final InvitationRepository invitationRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
 
-    @Override
+    /**
+     * Get all invitations for a user
+     */
     public List<InvitationDto> getUserInvitations(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -44,7 +50,9 @@ public class InvitationServiceImpl implements InvitationService {
                 .toList();
     }
 
-    @Override
+    /**
+     * Update invitation status - fixes PostgreSQL enum parameter binding issue
+     */
     @Transactional
     public void updateInvitationStatus(UUID invitationId, String newStatus) {
         log.info("Updating invitation status - ID: {}, New Status: {}", invitationId, newStatus);
@@ -52,8 +60,25 @@ public class InvitationServiceImpl implements InvitationService {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .orElseThrow(() -> new EntityNotFoundException("Invitation not found"));
 
-        String oldStatus = invitation.getStatus();
-        invitation.setStatus(newStatus);
+        String oldStatus = invitation.getStatus().toString();
+
+        // Convert string to enum to fix PostgreSQL parameter binding issue
+        Invitation.InvitationStatus statusEnum;
+        switch (newStatus.toLowerCase()) {
+            case "accept":
+                statusEnum = Invitation.InvitationStatus.ACCEPT;
+                break;
+            case "reject":
+                statusEnum = Invitation.InvitationStatus.REJECT;
+                break;
+            case "pending":
+                statusEnum = Invitation.InvitationStatus.PENDING;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid status: " + newStatus);
+        }
+
+        invitation.setStatus(statusEnum);
         invitation.setRespondedAt(LocalDateTime.now());
 
         // Save invitation - trigger will automatically run when status changes
@@ -74,18 +99,21 @@ public class InvitationServiceImpl implements InvitationService {
         }
     }
 
-    @Override
-    public InvitationDto createInvitation(String username, UUID boardId, UUID inviterUserId) {
-        log.info("Creating invitation - Username: {}, Board: {}, Inviter: {}",
-                username, boardId, inviterUserId);
+    /**
+     * Create invitation with email/username search capability - fixes user discovery issue
+     */
+    public InvitationDto createInvitation(String emailOrUsername, UUID boardId, UUID inviterUserId) {
+        log.info("Creating invitation - Email/Username: {}, Board: {}, Inviter: {}",
+                emailOrUsername, boardId, inviterUserId);
 
-        User invitedUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Invited user not found with username: " + username));
+        // Find user by email or username to support both input types
+        User invitedUser = userRepository.findByEmailOrUsername(emailOrUsername.trim())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email/username: " + emailOrUsername));
 
         User inviterUser = userRepository.findById(inviterUserId)
                 .orElseThrow(() -> new EntityNotFoundException("Inviter user not found"));
 
-        Boards board = boardRepository.findById(boardId)
+        Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException("Board not found"));
 
         // Check if user is trying to invite themselves
@@ -93,27 +121,21 @@ public class InvitationServiceImpl implements InvitationService {
             throw new IllegalArgumentException("Cannot invite yourself to a board");
         }
 
-        // Check if invitation already exists for this user and board with pending or accepted status
-        List<Invitation> existingInvitations = invitationRepository.findAllByInvitedUserAndBoardAndStatus(invitedUser, board, "pending");
-        boolean hasPendingInvitation = !existingInvitations.isEmpty();
-
-        if (hasPendingInvitation) {
+        // Use the fixed existsPendingInvitation method with proper enum parameter binding
+        if (invitationRepository.existsPendingInvitation(boardId, invitedUser.getId(), Invitation.InvitationStatus.PENDING)) {
             throw new IllegalArgumentException("User already has a pending invitation for this board");
         }
 
-        // Also check for accepted invitations
-        List<Invitation> acceptedInvitations = invitationRepository.findAllByInvitedUserAndBoardAndStatus(invitedUser, board, "accept");
-        boolean hasAcceptedInvitation = !acceptedInvitations.isEmpty();
-
-        if (hasAcceptedInvitation) {
+        // Check if user is already accepted (member of board) using the new method
+        if (invitationRepository.isUserAlreadyMember(boardId, invitedUser.getId())) {
             throw new IllegalArgumentException("User is already a member of this board");
         }
 
         Invitation invitation = new Invitation();
-        invitation.setBoard(board);
-        invitation.setInvitedUser(invitedUser);
-        invitation.setInviterUser(inviterUser);
-        invitation.setStatus("pending");
+        invitation.setBoardId(board.getId());
+        invitation.setInvitedUserId(invitedUser.getId());
+        invitation.setInviterUserId(inviterUser.getId());
+        invitation.setStatus(Invitation.InvitationStatus.PENDING);
         invitation.setSentAt(LocalDateTime.now());
 
         // Save invitation first
@@ -131,7 +153,9 @@ public class InvitationServiceImpl implements InvitationService {
         return mapToDto(savedInvitation);
     }
 
-    @Override
+    /**
+     * Create test invitations for development/testing purposes
+     */
     public void createTestInvitations(String userId) {
         log.info("Creating test invitations for user: {}", userId);
 
@@ -141,17 +165,17 @@ public class InvitationServiceImpl implements InvitationService {
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
             // Find some boards to create test invitations (exclude boards owned by this user)
-            List<Boards> boards = boardRepository.findAll().stream()
-                    .filter(board -> !board.getUser().getId().equals(userUuid))
+            List<Board> boards = boardRepository.findAll().stream()
+                    .filter(board -> !board.getOwner().getId().equals(userUuid))
                     .limit(3)
                     .toList();
 
-            for (Boards board : boards) {
+            for (Board board : boards) {
                 Invitation invitation = new Invitation();
-                invitation.setBoard(board);
-                invitation.setInvitedUser(user);
-                invitation.setInviterUser(board.getUser()); // Board owner is the inviter
-                invitation.setStatus("pending");
+                invitation.setBoardId(board.getId());
+                invitation.setInvitedUserId(user.getId());
+                invitation.setInviterUserId(board.getOwner().getId());
+                invitation.setStatus(Invitation.InvitationStatus.PENDING);
                 invitation.setSentAt(LocalDateTime.now());
 
                 // Save invitation
@@ -178,7 +202,6 @@ public class InvitationServiceImpl implements InvitationService {
 
     /**
      * Send invitation notification to the invited user
-     * @param invitation The invitation that was created
      */
     private void sendInvitationNotification(Invitation invitation) {
         try {
@@ -209,7 +232,6 @@ public class InvitationServiceImpl implements InvitationService {
 
     /**
      * Send accepted notification to the inviter user
-     * @param invitation The invitation that was accepted
      */
     private void sendAcceptedNotification(Invitation invitation) {
         try {
@@ -240,7 +262,6 @@ public class InvitationServiceImpl implements InvitationService {
 
     /**
      * Send rejected notification to the inviter user
-     * @param invitation The invitation that was rejected
      */
     private void sendRejectedNotification(Invitation invitation) {
         try {
@@ -272,14 +293,20 @@ public class InvitationServiceImpl implements InvitationService {
         }
     }
 
+    /**
+     * Map Invitation entity to DTO with proper null checks and correct field mapping
+     */
     private InvitationDto mapToDto(Invitation invitation) {
         InvitationDto dto = new InvitationDto();
         dto.setId(invitation.getId());
-        dto.setBoardTitle(invitation.getBoard().getTitle());
-        dto.setInviterUsername(invitation.getInviterUser().getUsername());
-        dto.setInviterAvatar(invitation.getInviterUser().getAvatar());
-        dto.setInvitedUsername(invitation.getInvitedUser().getUsername());
-        dto.setInvitedAvatar(invitation.getInvitedUser().getAvatar());
+        dto.setBoardId(invitation.getBoardId());
+        dto.setBoardTitle(invitation.getBoard() != null ? invitation.getBoard().getTitle() : "Unknown Board");
+        dto.setInvitedUserId(invitation.getInvitedUserId());
+        dto.setInvitedUserName(invitation.getInvitedUser() != null ? invitation.getInvitedUser().getUsername() : "Unknown User");
+        dto.setInvitedUserEmail(invitation.getInvitedUser() != null ? invitation.getInvitedUser().getEmail() : null);
+        dto.setInviterUserId(invitation.getInviterUserId());
+        dto.setInviterUserName(invitation.getInviterUser() != null ? invitation.getInviterUser().getUsername() : "Unknown User");
+        dto.setInviterUserEmail(invitation.getInviterUser() != null ? invitation.getInviterUser().getEmail() : null);
         dto.setStatus(invitation.getStatus());
         dto.setSentAt(invitation.getSentAt());
         dto.setRespondedAt(invitation.getRespondedAt());
