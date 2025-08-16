@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS columns (
   title VARCHAR(255) NOT NULL,
   created_at DATE NOT NULL,
   board_id UUID NOT NULL,
-  position DECIMAL(12, 6) NOT NULL,
+  position DECIMAL(20, 6) NOT NULL,
   CONSTRAINT fk_columns_board FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 
@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS cards (
   is_done BOOLEAN NOT NULL DEFAULT FALSE,
   created_at DATE NOT NULL,
   deadline TIMESTAMP,
-  position DECIMAL(12, 6) NOT NULL,
+  position DECIMAL(20, 4) NOT NULL,
   column_id UUID NOT NULL,
+  cover Text,
   CONSTRAINT fk_cards_column FOREIGN KEY (column_id) REFERENCES columns(id) ON DELETE CASCADE
 );
 

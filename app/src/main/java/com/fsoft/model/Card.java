@@ -5,6 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -12,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 
@@ -48,4 +50,7 @@ public class Card {
   @ManyToOne
   @JoinColumn(name = "column_id", nullable = false)
   private Columnn column;
+
+  @OneToMany(mappedBy = "cards")
+  private List<CardComment> cardComments;
 }

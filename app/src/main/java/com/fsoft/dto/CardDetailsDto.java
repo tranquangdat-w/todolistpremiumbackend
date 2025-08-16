@@ -3,6 +3,7 @@ package com.fsoft.dto;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Data;
@@ -18,4 +19,5 @@ public class CardDetailsDto {
   private String cover;
   private UUID columnId;
   private String description;
+  private List<CardCommentDetailsDto> comments;
 }
