@@ -42,6 +42,24 @@ public class SendMailService {
     sendMail(subject, receiver, htmlContent);
   }
 
+  public void sendForgotPasswordMail(String email, String username, String otp) throws ResendException {
+    String sendOtpLink = String.format(
+            "%s/users/verfication?email=%s&otp=%s",
+            WEBSITE_DOMAIN_DEV,
+            email,
+            otp
+    );
+
+    String htmlContent = String.format(
+            CONTENT_MAIL_VERIFY_ACCOUNT,
+            username,
+            sendOtpLink
+    );
+
+    String subject = "VNU-TEAM: Below is the OTP code to reset password.";
+    sendMail(subject, email, htmlContent);
+  }
+
   private void sendMail(
       final String subject,
       final String receiver,

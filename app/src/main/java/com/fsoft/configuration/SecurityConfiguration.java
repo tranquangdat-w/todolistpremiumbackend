@@ -33,7 +33,10 @@ public class SecurityConfiguration {
                 "/users/refresh_token",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/swagger-ui.html").permitAll()
+                "/swagger-ui.html",
+                "/users/send-otp",
+                "boards/search",
+                "/users/verify-otp-and-change-password").permitAll()
                 .anyRequest().authenticated())
         // Using JWT insted of session management
         .sessionManagement(
