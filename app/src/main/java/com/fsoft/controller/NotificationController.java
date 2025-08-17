@@ -2,7 +2,9 @@ package com.fsoft.controller;
 
 import com.fsoft.dto.InvitationDto;
 import com.fsoft.model.Board;
+import com.fsoft.model.BoardMember;
 import com.fsoft.model.User;
+import com.fsoft.repository.BoardMemberRepository;
 import com.fsoft.repository.BoardRepository;
 import com.fsoft.repository.UserRepository;
 import com.fsoft.service.InvitationServiceImpl;
@@ -15,6 +17,8 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.security.Principal;
@@ -31,7 +35,8 @@ public class NotificationController {
 
     private final BoardRepository boardRepository;
 
-    // Handle messages sent to /app/send
+    private final BoardMemberRepository boardMemberRepository;
+
     @MessageMapping("/send-invitation")
     public void sendMessage(InvitationDto message) {
         User inviter = userRepository.findByEmail(message.getInviterUsername())
@@ -59,6 +64,15 @@ public class NotificationController {
     public void updateInvitation(InvitationDto message) {
         UUID invitationId = message.getInvitationId();
         String status = message.getStatus();
+        if (status.equals("accept")) {
+            User invited = userRepository.findByEmail(message.getInvitedUsername())
+                    .orElseThrow(() -> new EntityNotFoundException("Invited user not found"));
+            boardMemberRepository.save(BoardMember.builder()
+                    .boardId(message.getBoardId())
+                    .userId(invited.getId())
+                    .joinedAt(LocalDateTime.now())
+                    .build());
+        }
         invitationService.updateInvitationStatus(invitationId, status);
         messagingTemplate.convertAndSendToUser(
                 message.getInvitedUsername(),
@@ -88,10 +102,7 @@ public class NotificationController {
         String userEmail = principal.getName(); // principal name should be email (or userId depending on your handshake handler)
 
         if (destination != null && destination.equals("/user/queue/messages")) {
-            // Fetch invitations by user email
             List<InvitationDto> invitations = invitationService.getUserInvitations(userEmail);
-
-            // Send the list of invitations
             messagingTemplate.convertAndSendToUser(
                     userEmail,
                     "/queue/messages",
