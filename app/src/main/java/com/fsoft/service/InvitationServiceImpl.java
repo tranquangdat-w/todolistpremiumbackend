@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fsoft.model.Board;
+import com.fsoft.repository.BoardRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.fsoft.dto.InvitationDto;
@@ -22,9 +25,9 @@ public class InvitationServiceImpl implements InvitationService {
     private final InvitationRepository invitationRepository;
     private final UserRepository userRepository;
 
-    @Override
-    public List<InvitationDto> getUserInvitations(UUID userId) {
-        User user = userRepository.findById(userId)
+    private final BoardRepository boardRepository;
+    public List<InvitationDto> getUserInvitations(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return invitationRepository.findAllByInvitedUser(user)
@@ -33,7 +36,32 @@ public class InvitationServiceImpl implements InvitationService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+//    @Override
+//    public List<InvitationDto> getUserInvitations(UUID userId) {
+//        User user = userRepository.findByEmail(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+//
+//        return invitationRepository.findAllByInvitedUser(user)
+//                .stream()
+//                .map(this::mapToDto)
+//                .collect(Collectors.toList());
+//    }
+
+    @Transactional
+    public UUID createInvitation(User inviter, User invited, Board board) {
+        Invitation entity = Invitation.builder()
+                .board(board)
+                .inviterUser(inviter)
+                .invitedUser(invited)
+                .status("pending")
+                .sentAt(LocalDateTime.now())
+                .build();
+
+        Invitation saved = invitationRepository.save(entity);
+        return saved.getId();
+    }
+
+    @Transactional
     public void updateInvitationStatus(UUID invitationId, String newStatus) {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .orElseThrow(() -> new EntityNotFoundException("Invitation not found"));
@@ -45,11 +73,12 @@ public class InvitationServiceImpl implements InvitationService {
 
     private InvitationDto mapToDto(Invitation invitation) {
         return InvitationDto.builder()
-                .id(invitation.getId())
+                .invitationId(invitation.getId())
+                .boardId(invitation.getBoard().getId())
                 .boardTitle(invitation.getBoard().getTitle())
-                .inviterUsername(invitation.getInviterUser().getUsername())
+                .inviterUsername(invitation.getInviterUser().getEmail())
                 .inviterAvatar(invitation.getInviterUser().getAvatar())
-                .invitedUsername(invitation.getInvitedUser().getUsername())
+                .invitedUsername(invitation.getInvitedUser().getEmail())
                 .invitedAvatar(invitation.getInvitedUser().getAvatar())
                 .status(invitation.getStatus())
                 .sentAt(invitation.getSentAt())

@@ -6,6 +6,9 @@ import java.util.UUID;
 import com.fsoft.dto.InvitationDto;
 
 public interface InvitationService {
-    List<InvitationDto> getUserInvitations(UUID userId);
+//    List<InvitationDto> getUserInvitations(UUID userId);
+
+    List<InvitationDto> getUserInvitations(String email);
+
     void updateInvitationStatus(UUID invitationId, String newStatus);
 }
