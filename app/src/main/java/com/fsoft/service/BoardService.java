@@ -13,7 +13,7 @@ import com.fsoft.mapper.BoardMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public class BoardService {
   private final BoardRepository boardRepository;
 
   @Transactional
-  public void createBoard(UUID userId, CreateBoardDto createBoardDto) {
+  public BoardDto createBoard(UUID userId, CreateBoardDto createBoardDto) {
     Board board = new Board();
     User user = new User();
     user.setId(userId);
@@ -38,9 +38,11 @@ public class BoardService {
 
     board.setTitle(createBoardDto.getTitle());
     board.setOwner(user);
-    board.setCreatedAt(LocalDate.now());
+    board.setCreatedAt(Instant.now());
 
-    boardRepository.save(board);
+    Board createdBoard = boardRepository.save(board);
+
+    return BoardMapper.toBoardDto(createdBoard);
   }
 
   @Transactional

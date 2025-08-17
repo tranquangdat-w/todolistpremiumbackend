@@ -1,6 +1,6 @@
 package com.fsoft.model;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -56,5 +56,5 @@ public class Board {
 
   @NotNull
   @Column(name = "created_at")
-  private LocalDate createdAt;
+  private Instant createdAt;
 }

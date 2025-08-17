@@ -1,8 +1,5 @@
 package com.fsoft;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

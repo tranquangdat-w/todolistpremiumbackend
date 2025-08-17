@@ -28,13 +28,12 @@ public class BoardController {
   private final BoardService boardService;
 
   @PostMapping
-  public ResponseEntity<Map<String, String>> createBoard(
+  public ResponseEntity<BoardDto> createBoard(
       @Valid @RequestBody CreateBoardDto createBoardDto,
       @AuthenticationPrincipal JwtPayload jwtPayload) {
     UUID userId = jwtPayload.getId();
-    boardService.createBoard(userId, createBoardDto);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(Map.of("message", "Create new board successfully"));
+    BoardDto createdBoard = boardService.createBoard(userId, createBoardDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
   }
 
   @PutMapping("/{boardId}")

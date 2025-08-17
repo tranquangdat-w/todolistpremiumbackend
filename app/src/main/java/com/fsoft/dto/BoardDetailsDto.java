@@ -1,6 +1,6 @@
 package com.fsoft.dto;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -15,5 +15,5 @@ public class BoardDetailsDto {
   private UserDto owner;
   private Set<UserDto> members;
   private List<ColumnDetailsDto> columns;
-  private LocalDate createdAt;
+  private Instant createdAt;
 }
