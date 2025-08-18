@@ -1,9 +1,6 @@
 package com.fsoft.service;
 
-import com.fsoft.dto.BoardDetailsDto;
-import com.fsoft.dto.BoardDto;
-import com.fsoft.dto.CreateBoardDto;
-import com.fsoft.dto.UpdateBoardDto;
+import com.fsoft.dto.*;
 import com.fsoft.exceptions.ApiException;
 import com.fsoft.model.Board;
 import com.fsoft.model.User;
@@ -13,8 +10,11 @@ import com.fsoft.mapper.BoardMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ public class BoardService {
   private final BoardRepository boardRepository;
 
   @Transactional
-  public void createBoard(UUID userId, CreateBoardDto createBoardDto) {
+  public BoardDto createBoard(UUID userId, CreateBoardDto createBoardDto) {
     Board board = new Board();
     User user = new User();
     user.setId(userId);
@@ -38,9 +38,11 @@ public class BoardService {
 
     board.setTitle(createBoardDto.getTitle());
     board.setOwner(user);
-    board.setCreatedAt(LocalDate.now());
+    board.setCreatedAt(Instant.now());
 
-    boardRepository.save(board);
+    Board createdBoard = boardRepository.save(board);
+
+    return BoardMapper.toBoardDto(createdBoard);
   }
 
   @Transactional
@@ -93,6 +95,25 @@ public class BoardService {
         && !board.getMembers().stream().anyMatch(member -> member.getId().equals(userId))) {
       throw new ApiException("You don't have permission to view this board",
           HttpStatus.FORBIDDEN.value());
+    }
+  }
+
+  public List<SearchBoardDto> searchBoardByKeyword(UUID owner_id, String keyword) {
+    if (keyword == null ||keyword.isBlank()) {
+      return Collections.emptyList();
+    }
+    try {
+      List<Board> boards = boardRepository.findByBoardNameContaining(owner_id, keyword);
+      return boards.stream()
+              .map(board -> {
+                SearchBoardDto searchBoardDto = new SearchBoardDto();
+                searchBoardDto.setId(board.getId());
+                searchBoardDto.setTitle(board.getTitle());
+                return searchBoardDto;
+              })
+              .collect(Collectors.toList());
+    } catch (Exception e){
+      return Collections.emptyList();
     }
   }
 }

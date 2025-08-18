@@ -3,8 +3,14 @@ package com.fsoft.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import com.fsoft.dto.VerifyAndChangePasswordRequestDto;
+import com.resend.core.exception.ResendException;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +40,8 @@ public class UserService {
   private final JwtProperties jwtProperties;
   private final JwtTokenManager jwtTokenManager;
   private final DropboxService dropboxService;
+  private final SendMailService sendMailService;
+  private final StringRedisTemplate redisTemplate;
 
   public User registration(
       String username,
@@ -239,5 +247,55 @@ public class UserService {
           String.format("Email '%s' is exists", email),
           HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
+  }
+
+  public void sendForgotPasswordOtp(String email) throws ResendException {
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(
+        String.format("User with email %s is not exists", email),
+        HttpStatus.BAD_REQUEST.value()));
+
+    String otp = String.format("%06d", new Random().nextInt(999999));
+    String key = "otp:" + email;
+
+    redisTemplate.opsForValue().set(key, otp, 5, TimeUnit.MINUTES);
+
+    sendMailService.sendForgotPasswordMail(user.getEmail(), user.getUsername(), otp);
+  }
+
+  @Transactional
+  public Map<String, String> verifyOtpAndChangePassword(
+      String email, String otp, VerifyAndChangePasswordRequestDto verifyAndChangePasswordRequestDto) {
+
+    String key = "otp:" + email;
+    String realOTP = redisTemplate.opsForValue().get(key);
+
+    if (realOTP == null) {
+      throw new ApiException("OTP is expired, please try again", HttpStatus.BAD_REQUEST.value());
+    }
+
+    if (!otp.equals(realOTP)) {
+      throw new ApiException("Invalid OTP", HttpStatus.BAD_REQUEST.value());
+    }
+
+    resetPassword(email, verifyAndChangePasswordRequestDto.getNewPassword(),
+        verifyAndChangePasswordRequestDto.getConfirmPassword());
+
+    redisTemplate.delete(key);
+
+    return Map.of("message", "OTP verified and password changed successfully");
+  }
+
+  @Transactional
+  public void resetPassword(String email, String newPassword, String confirmPassword) {
+    if (!newPassword.equals(confirmPassword)) {
+      throw new ApiException("Passwords do not match");
+    }
+
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ApiException("User not found with email: " + email));
+
+    String encodedPassword = passwordEncoder.encode(newPassword);
+    user.setPassword(encodedPassword);
+    userRepository.save(user);
   }
 }

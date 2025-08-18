@@ -17,7 +17,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -27,38 +26,36 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 public class NotificationController {
-    private final InvitationServiceImpl invitationService;
+  private final InvitationServiceImpl invitationService;
 
-    private final SimpMessagingTemplate messagingTemplate;
+  private final SimpMessagingTemplate messagingTemplate;
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    private final BoardRepository boardRepository;
+  private final BoardRepository boardRepository;
 
-    private final BoardMemberRepository boardMemberRepository;
+  private final BoardMemberRepository boardMemberRepository;
 
-    @MessageMapping("/send-invitation")
-    public void sendMessage(InvitationDto message) {
-        User inviter = userRepository.findByEmail(message.getInviterUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Inviter user not found"));
-        User invited = userRepository.findByEmail(message.getInvitedUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Invited user not found"));
-        Board board = boardRepository.findById(message.getBoardId())
+  @MessageMapping("/send-invitation")
+  public void sendMessage(InvitationDto message) {
+    User inviter = userRepository.findByEmail(message.getInviterUsername())
+        .orElseThrow(() -> new EntityNotFoundException("Inviter user not found"));
+    User invited = userRepository.findByEmail(message.getInvitedUsername())
+        .orElseThrow(() -> new EntityNotFoundException("Invited user not found"));
+    Board board = boardRepository.findById(message.getBoardId())
 
-                .orElseThrow(() -> new EntityNotFoundException("Board not found"));
-        UUID invitationId = invitationService.createInvitation(inviter, invited, board);
-//        message.setInviterUsername(inviter.getEmail());
-        message.setInvitationId(invitationId);
-//        message.setInviterUsername(inviter.getUsername());
-        messagingTemplate.convertAndSendToUser(
-                message.getInvitedUsername(),
-                "/queue/messages",
-                Map.of(
-                        "type", "createInvitation",
-                        "payload", message
-                )
-        );
-    }
+        .orElseThrow(() -> new EntityNotFoundException("Board not found"));
+    UUID invitationId = invitationService.createInvitation(inviter, invited, board);
+    // message.setInviterUsername(inviter.getEmail());
+    message.setInvitationId(invitationId);
+    // message.setInviterUsername(inviter.getUsername());
+    messagingTemplate.convertAndSendToUser(
+        message.getInvitedUsername(),
+        "/queue/messages",
+        Map.of(
+            "type", "createInvitation",
+            "payload", message));
+  }
 
     @MessageMapping("/update-invitation")
     public void updateInvitation(InvitationDto message) {

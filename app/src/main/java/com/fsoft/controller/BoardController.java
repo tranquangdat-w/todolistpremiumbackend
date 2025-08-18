@@ -1,19 +1,17 @@
 package com.fsoft.controller;
 
-import com.fsoft.dto.BoardDetailsDto;
-import com.fsoft.dto.BoardDto;
-import com.fsoft.dto.CreateBoardDto;
-import com.fsoft.dto.UpdateBoardDto;
+import com.fsoft.dto.*;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.BoardService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fsoft.dto.PageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,13 +26,12 @@ public class BoardController {
   private final BoardService boardService;
 
   @PostMapping
-  public ResponseEntity<Map<String, String>> createBoard(
+  public ResponseEntity<BoardDto> createBoard(
       @Valid @RequestBody CreateBoardDto createBoardDto,
       @AuthenticationPrincipal JwtPayload jwtPayload) {
     UUID userId = jwtPayload.getId();
-    boardService.createBoard(userId, createBoardDto);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(Map.of("message", "Create new board successfully"));
+    BoardDto createdBoard = boardService.createBoard(userId, createBoardDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
   }
 
   @PutMapping("/{boardId}")
@@ -73,5 +70,14 @@ public class BoardController {
     BoardDetailsDto board = boardService.getBoardDetail(boardId, userId);
 
     return ResponseEntity.ok(board);
+  }
+
+  @GetMapping("/search")
+  public ResponseEntity<List<SearchBoardDto>> getBoardByKeyword(
+      @AuthenticationPrincipal JwtPayload jwtPayload,
+      @RequestParam(name = "title", required = true) String search) {
+    UUID owner_id = jwtPayload.getId();
+    List<SearchBoardDto> searchBoardDtos = boardService.searchBoardByKeyword(owner_id, search);
+    return ResponseEntity.ok(searchBoardDtos);
   }
 }

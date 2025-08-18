@@ -1,6 +1,6 @@
 package com.fsoft.dto;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.Data;
 
@@ -9,5 +9,5 @@ public class BoardDto {
   private UUID id;
   private String title;
   private String description;
-  private LocalDate createdAt;
+  private Instant createdAt;
 }
