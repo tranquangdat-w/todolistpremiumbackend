@@ -57,57 +57,51 @@ public class NotificationController {
             "payload", message));
   }
 
-  @MessageMapping("/update-invitation")
-  public void updateInvitation(InvitationDto message) {
-    UUID invitationId = message.getInvitationId();
-    String status = message.getStatus();
-    if (status.equals("accept")) {
-      User invited = userRepository.findByEmail(message.getInvitedUsername())
-          .orElseThrow(() -> new EntityNotFoundException("Invited user not found"));
-      boardMemberRepository.save(BoardMember.builder()
-          .boardId(message.getBoardId())
-          .userId(invited.getId())
-          .joinedAt(LocalDateTime.now())
-          .build());
+    @MessageMapping("/update-invitation")
+    public void updateInvitation(InvitationDto message) {
+        UUID invitationId = message.getInvitationId();
+        String status = message.getStatus();
+        invitationService.updateInvitationStatus(invitationId, status);
+        String inviterUsername = message.getInviterUsername();
+        message.setInviterUsername(message.getInvitedUsername());
+        message.setInvitedUsername(inviterUsername);
+        messagingTemplate.convertAndSendToUser(
+                message.getInvitedUsername(),
+                "/queue/messages",
+                Map.of(
+                        "type", "updateInvitation",
+                        "payload", message
+                )
+        );
     }
-    invitationService.updateInvitationStatus(invitationId, status);
-    messagingTemplate.convertAndSendToUser(
-        message.getInvitedUsername(),
-        "/queue/messages",
-        Map.of(
-            "type", "updateInvitation",
-            "payload", message));
-  }
 
-  // @MessageMapping("/send-comment")
-  // public void sendComment(CommentNotificationDto dto, Principal principal) {
-  // ... }
-  //
-  // @MessageMapping("/send-assignment")
-  // public void sendAssignment(CardAssignmenNotificationtDto dto, Principal
-  // principal) { ... }
+//    @MessageMapping("/send-comment")
+//    public void sendComment(CommentNotificationDto dto, Principal principal) { ... }
+//
+//    @MessageMapping("/send-assignment")
+//    public void sendAssignment(CardAssignmenNotificationtDto dto, Principal principal) { ... }
 
-  // Listen for subscription events
-  @EventListener
-  public void handleSubscribeEvent(SessionSubscribeEvent event) {
-    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-    Principal principal = accessor.getUser();
+    // Listen for subscription events
+    @EventListener
+    public void handleSubscribeEvent(SessionSubscribeEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Principal principal = accessor.getUser();
 
-    if (principal == null)
-      return;
+        if (principal == null) return;
 
-    String destination = accessor.getDestination();
-    String userEmail = principal.getName(); // principal name should be email (or userId depending on your handshake
-                                            // handler)
+        String destination = accessor.getDestination();
+        String userEmail = principal.getName(); // principal name should be email (or userId depending on your handshake handler)
 
-    if (destination != null && destination.equals("/user/queue/messages")) {
-      List<InvitationDto> invitations = invitationService.getUserInvitations(userEmail);
-      messagingTemplate.convertAndSendToUser(
-          userEmail,
-          "/queue/messages",
-          Map.of(
-              "type", "invitations",
-              "payload", invitations));
+        if (destination != null && destination.equals("/user/queue/messages")) {
+            List<InvitationDto> invitations = invitationService.getUserInvitations(userEmail);
+            messagingTemplate.convertAndSendToUser(
+                    userEmail,
+                    "/queue/messages",
+                    Map.of(
+                            "type", "invitations",
+                            "payload", invitations
+                    )
+            );
+        }
     }
-  }
 }

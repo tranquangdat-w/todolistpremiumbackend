@@ -3,14 +3,18 @@ package com.fsoft.service;
 import com.fsoft.dto.*;
 import com.fsoft.exceptions.ApiException;
 import com.fsoft.model.Board;
+import com.fsoft.model.BoardMember;
 import com.fsoft.model.User;
+import com.fsoft.repository.BoardMemberRepository;
 import com.fsoft.repository.BoardRepository;
 import com.fsoft.mapper.BoardMapper;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +29,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BoardService {
   private final BoardRepository boardRepository;
+
+  private final BoardMemberRepository boardMemberRepository;
 
   @Transactional
   public BoardDto createBoard(UUID userId, CreateBoardDto createBoardDto) {
@@ -43,6 +49,16 @@ public class BoardService {
     Board createdBoard = boardRepository.save(board);
 
     return BoardMapper.toBoardDto(createdBoard);
+  }
+
+  @Transactional
+  public BoardDto addMember(UUID boardId, UUID memberId) {
+    boardMemberRepository.save(BoardMember.builder()
+            .boardId(boardId)
+            .userId(memberId)
+            .joinedAt(LocalDateTime.now())
+            .build());
+    return null;
   }
 
   @Transactional

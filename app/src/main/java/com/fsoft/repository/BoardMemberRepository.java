@@ -5,6 +5,5 @@ import com.fsoft.model.BoardMemberId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
-public interface BoardMemberRepository extends JpaRepository<BoardMember, UUID> {
-
+public interface BoardMemberRepository extends JpaRepository<BoardMember, BoardMemberId> {
 }
