@@ -35,6 +35,7 @@ dependencies {
     implementation("com.resend:resend-java:3.1.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
