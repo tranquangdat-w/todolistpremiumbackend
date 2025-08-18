@@ -68,9 +68,6 @@ public class User {
   @Column(name = "created_at")
   private LocalDate createdAt;
 
-  @Column(name = "otp")
-  private String otp;
-
   @ManyToMany(mappedBy = "members")
   private Set<Board> boards;
 }
