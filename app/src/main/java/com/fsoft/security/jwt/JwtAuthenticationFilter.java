@@ -41,6 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       "/users/verify",
       "/users/logout",
       "/v3/api-docs",
+      "/users/send-otp",
+      "/users/verify-otp-and-change-password",
       "/users/refresh_token");
 
   @Override
