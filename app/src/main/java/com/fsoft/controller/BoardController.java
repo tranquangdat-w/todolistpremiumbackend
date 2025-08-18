@@ -73,14 +73,11 @@ public class BoardController {
   }
 
   @GetMapping("/search")
-  public ResponseEntity<Map<String, Object>> getBoardByKeyword(
-          @AuthenticationPrincipal JwtPayload jwtPayload,
-          @RequestParam(required = false) String search) {
+  public ResponseEntity<List<SearchBoardDto>> getBoardByKeyword(
+      @AuthenticationPrincipal JwtPayload jwtPayload,
+      @RequestParam(name = "title", required = true) String search) {
     UUID owner_id = jwtPayload.getId();
     List<SearchBoardDto> searchBoardDtos = boardService.searchBoardByKeyword(owner_id, search);
-    Map<String, Object> response = new HashMap<>();
-    response.put("data", searchBoardDtos);
-    response.put("status", "success");
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(searchBoardDtos);
   }
 }

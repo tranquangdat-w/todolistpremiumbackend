@@ -27,11 +27,12 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
 
   Optional<Board> findById(UUID id);
 
-  @Query(value = """
-    SELECT id, title
-    FROM boards b
-    WHERE b.owner_id = :owner_id
-      AND LOWER(b.title) LIKE '%' || LOWER(:keyword) || '%'
-    """, nativeQuery = true)
-  List<Board> findByBoardNameContaining(@Param("owner_id") UUID owner_id, @Param("keyword") String keyword);
+  @Query("""
+      SELECT DISTINCT b
+      FROM Board b
+      LEFT JOIN b.members m
+      WHERE (b.owner.id = :ownerId OR m.id = :ownerId)
+        AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      """)
+  List<Board> findByBoardNameContaining(@Param("ownerId") UUID ownerId, @Param("keyword") String keyword);
 }
