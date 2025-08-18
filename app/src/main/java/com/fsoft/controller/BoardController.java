@@ -1,9 +1,13 @@
 package com.fsoft.controller;
 
 import com.fsoft.dto.*;
+import com.fsoft.model.User;
+import com.fsoft.repository.UserRepository;
 import com.fsoft.security.jwt.JwtPayload;
 import com.fsoft.service.BoardService;
 
+import com.fsoft.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +29,9 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
   private final BoardService boardService;
 
+  private final UserRepository userRepository;
+
+
   @PostMapping
   public ResponseEntity<BoardDto> createBoard(
       @Valid @RequestBody CreateBoardDto createBoardDto,
@@ -42,6 +49,18 @@ public class BoardController {
     UUID userId = jwtPayload.getId();
     boardService.updateBoard(boardId, userId, updateBoardDto);
     return ResponseEntity.ok(Map.of("message", "Update board successfully"));
+  }
+
+  @PutMapping("/member/{boardId}/{memberEmail}")
+  public ResponseEntity<Map<String, String>> addBoardMember(
+          @PathVariable UUID boardId,
+          @PathVariable String memberEmail,
+          @AuthenticationPrincipal JwtPayload jwtPayload) {
+    User user = userRepository.findByEmail(memberEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + memberEmail));
+    boardService.addMember(boardId, user.getId());
+
+    return ResponseEntity.ok(Map.of("message", "Board member added successfully"));
   }
 
   @DeleteMapping("/{boardId}")

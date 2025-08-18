@@ -61,15 +61,6 @@ public class NotificationController {
     public void updateInvitation(InvitationDto message) {
         UUID invitationId = message.getInvitationId();
         String status = message.getStatus();
-        if (status.equals("accept")) {
-            User invited = userRepository.findByEmail(message.getInvitedUsername())
-                    .orElseThrow(() -> new EntityNotFoundException("Invited user not found"));
-            boardMemberRepository.save(BoardMember.builder()
-                    .boardId(message.getBoardId())
-                    .userId(invited.getId())
-                    .joinedAt(LocalDateTime.now())
-                    .build());
-        }
         invitationService.updateInvitationStatus(invitationId, status);
         String inviterUsername = message.getInviterUsername();
         message.setInviterUsername(message.getInvitedUsername());
