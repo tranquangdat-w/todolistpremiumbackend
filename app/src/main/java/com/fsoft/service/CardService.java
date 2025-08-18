@@ -1,15 +1,22 @@
 package com.fsoft.service;
 
 import com.fsoft.dto.CardDetailsDto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import com.fsoft.dto.CardUpdateRequest;
 import com.fsoft.dto.CreateCardRequest;
 import com.fsoft.exceptions.ApiException;
 import com.fsoft.mapper.CardMapper;
 import com.fsoft.model.Board;
 import com.fsoft.model.Card;
+import com.fsoft.model.CardMember;
+import com.fsoft.model.CardMemberId;
 import com.fsoft.model.Columnn;
 import com.fsoft.repository.BoardRepository;
 import com.fsoft.repository.CardRepository;
+import com.fsoft.repository.CardMemberRepository;
+import com.fsoft.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +33,10 @@ public class CardService {
   private final CardRepository cardRepository;
   private final BoardRepository boardRepository;
   private final DropboxService dropboxService;
+  private final CardMemberRepository cardMemberRepository;
+  private final UserRepository userRepository;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Transactional
   public CardDetailsDto createCard(UUID userId, CreateCardRequest request) {
@@ -163,5 +174,56 @@ public class CardService {
       e.printStackTrace();
       throw new ApiException(e.getMessage());
     }
+  }
+
+  @Transactional
+  public CardDetailsDto addMemberToCard(UUID userId, UUID boardId, UUID cardId, UUID memberId) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
+
+    Card card = checkCardExist(cardId);
+
+    userRepository.findById(memberId)
+        .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND.value()));
+
+    boolean isBoardMember = board.getMembers().stream().anyMatch(u -> u.getId().equals(memberId))
+        || board.getOwner().getId().equals(memberId);
+    if (!isBoardMember) {
+      throw new ApiException("User is not a member of this board", HttpStatus.BAD_REQUEST.value());
+    }
+
+    boolean isCardMember = card.getCardMembers().stream().anyMatch(m -> m.getUserId().equals(memberId));
+    if (isCardMember) {
+      throw new ApiException("User is already a member of this card", HttpStatus.BAD_REQUEST.value());
+    }
+
+    CardMember cardMember = new CardMember();
+    cardMember.setCardId(cardId);
+    cardMember.setUserId(memberId);
+
+    cardMemberRepository.saveAndFlush(cardMember);
+
+    entityManager.clear();
+    Card updatedCard = checkCardExist(cardId);
+    return CardMapper.toCardDetailsDto(updatedCard);
+  }
+
+  @Transactional
+  public CardDetailsDto removeMemberFromCard(UUID userId, UUID boardId, UUID cardId, UUID memberId) {
+    Board board = checkBoardExist(boardId);
+    checkPermisstionOfUser(board, userId);
+
+    checkCardExist(cardId);
+
+    CardMemberId cardMemberId = new CardMemberId(cardId, memberId);
+
+    CardMember cardMember = cardMemberRepository.findById(cardMemberId)
+        .orElseThrow(() -> new ApiException("User is not a member of this card", HttpStatus.BAD_REQUEST.value()));
+
+    cardMemberRepository.delete(cardMember);
+    cardMemberRepository.flush();
+
+    Card updatedCard = checkCardExist(cardId);
+    return CardMapper.toCardDetailsDto(updatedCard);
   }
 }

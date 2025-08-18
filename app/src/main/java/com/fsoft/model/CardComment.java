@@ -25,7 +25,7 @@ public class CardComment {
   @ManyToOne()
   @JoinColumn(name = "card_id", referencedColumnName = "id")
   @NotNull
-  private Card cards;
+  private Card card;
 
   @ManyToOne()
   @JoinColumn(name = "user_id", referencedColumnName = "id")

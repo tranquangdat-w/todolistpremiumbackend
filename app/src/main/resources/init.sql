@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
   verify_token VARCHAR(255),
   avatar TEXT,
   created_at DATE NOT NULL,
-  otp VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS boards (
@@ -27,7 +26,7 @@ CREATE TABLE IF NOT EXISTS columns (
   title VARCHAR(255) NOT NULL,
   created_at DATE NOT NULL,
   board_id UUID NOT NULL,
-  position DECIMAL(20, 6) NOT NULL,
+  position DECIMAL(20, 4) NOT NULL,
   CONSTRAINT fk_columns_board FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 
@@ -78,3 +77,11 @@ CREATE TABLE IF NOT EXISTS invitations (
   CONSTRAINT chk_invited_not_inviter CHECK (invited_user_id <> inviter_user_id)
 );
 
+     
+CREATE TABLE IF NOT EXISTS card_members (
+  card_id UUID NOT NULL,
+  user_id UUID NOT NULL,
+  PRIMARY KEY (card_id, user_id),
+  CONSTRAINT fk_card_members_card FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
+  CONSTRAINT fk_card_members_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

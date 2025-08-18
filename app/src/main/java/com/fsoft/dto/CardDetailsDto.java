@@ -20,4 +20,5 @@ public class CardDetailsDto {
   private UUID columnId;
   private String description;
   private List<CardCommentDetailsDto> comments;
+  private List<UUID> memberIds;
 }

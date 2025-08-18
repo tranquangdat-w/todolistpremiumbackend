@@ -1,6 +1,7 @@
 package com.fsoft.model;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -70,4 +72,7 @@ public class User {
 
   @ManyToMany(mappedBy = "members")
   private Set<Board> boards;
+
+  @OneToMany(mappedBy = "user")
+  private List<CardMember> cardMembers;
 }

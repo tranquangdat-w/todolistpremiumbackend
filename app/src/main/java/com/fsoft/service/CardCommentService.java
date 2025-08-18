@@ -22,47 +22,47 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CardCommentService {
-    private final CardCommentRepository cardCommentRepository;
-    private final CardRepository cardRepository;
-    private final UserRepository userRepository;
+  private final CardCommentRepository cardCommentRepository;
+  private final CardRepository cardRepository;
+  private final UserRepository userRepository;
 
-    public CardCommentDetailsDto createComment(CreateCardCommentDto createDto, JwtPayload payload) {
-        Card card = cardRepository.findById(createDto.getCardId())
-                .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
-        User user = userRepository.findById(payload.getId())
-                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND.value()));
+  public CardCommentDetailsDto createComment(CreateCardCommentDto createDto, JwtPayload payload) {
+    Card card = cardRepository.findById(createDto.getCardId())
+        .orElseThrow(() -> new ApiException("Card not found", HttpStatus.NOT_FOUND.value()));
+    User user = userRepository.findById(payload.getId())
+        .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND.value()));
 
-        CardComment newComment = new CardComment();
-        newComment.setCards(card);
-        newComment.setUser(user);
-        newComment.setContent(createDto.getContent());
-        newComment.setCreatedAt(Instant.now());
+    CardComment newComment = new CardComment();
+    newComment.setCard(card);
+    newComment.setUser(user);
+    newComment.setContent(createDto.getContent());
+    newComment.setCreatedAt(Instant.now());
 
-        CardComment savedComment = cardCommentRepository.save(newComment);
-        return CardCommentMapper.toCardCommentDetailsDto(savedComment);
+    CardComment savedComment = cardCommentRepository.save(newComment);
+    return CardCommentMapper.toCardCommentDetailsDto(savedComment);
+  }
+
+  public CardCommentDetailsDto updateComment(UUID commentId, UpdateCardCommentDto updateDto, JwtPayload payload) {
+    CardComment comment = cardCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ApiException("Comment not found", HttpStatus.NOT_FOUND.value()));
+
+    if (!comment.getUser().getId().equals(payload.getId())) {
+      throw new ApiException("You are not the owner of this comment", HttpStatus.FORBIDDEN.value());
     }
 
-    public CardCommentDetailsDto updateComment(UUID commentId, UpdateCardCommentDto updateDto, JwtPayload payload) {
-        CardComment comment = cardCommentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException("Comment not found", HttpStatus.NOT_FOUND.value()));
+    comment.setContent(updateDto.getContent());
+    CardComment updatedComment = cardCommentRepository.save(comment);
+    return CardCommentMapper.toCardCommentDetailsDto(updatedComment);
+  }
 
-        if (!comment.getUser().getId().equals(payload.getId())) {
-            throw new ApiException("You are not the owner of this comment", HttpStatus.FORBIDDEN.value());
-        }
+  public void deleteComment(UUID commentId, JwtPayload payload) {
+    CardComment comment = cardCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ApiException("Comment not found", HttpStatus.NOT_FOUND.value()));
 
-        comment.setContent(updateDto.getContent());
-        CardComment updatedComment = cardCommentRepository.save(comment);
-        return CardCommentMapper.toCardCommentDetailsDto(updatedComment);
+    if (!comment.getUser().getId().equals(payload.getId())) {
+      throw new ApiException("You are not the owner of this comment", HttpStatus.FORBIDDEN.value());
     }
 
-    public void deleteComment(UUID commentId, JwtPayload payload) {
-        CardComment comment = cardCommentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException("Comment not found", HttpStatus.NOT_FOUND.value()));
-
-        if (!comment.getUser().getId().equals(payload.getId())) {
-            throw new ApiException("You are not the owner of this comment", HttpStatus.FORBIDDEN.value());
-        }
-
-        cardCommentRepository.delete(comment);
-    }
+    cardCommentRepository.delete(comment);
+  }
 }

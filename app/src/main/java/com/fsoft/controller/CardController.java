@@ -1,5 +1,6 @@
 package com.fsoft.controller;
 
+import com.fsoft.dto.AddCardMemberRequest;
 import com.fsoft.dto.CardDetailsDto;
 import com.fsoft.dto.CardUpdateRequest;
 import com.fsoft.dto.CreateCardRequest;
@@ -90,5 +91,24 @@ public class CardController {
     CardDetailsDto updatedCard = cardService.updateCardCover(userId, boardId, cardId, coverFile);
 
     return ResponseEntity.status(HttpStatus.OK).body(updatedCard);
+  }
+
+  @PostMapping("/{cardId}/members")
+  public ResponseEntity<CardDetailsDto> addMemberToCard(
+      @PathVariable UUID cardId,
+      @RequestBody AddCardMemberRequest request,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+    CardDetailsDto updatedCard = cardService.addMemberToCard(jwtPayload.getId(), request.getBoardId(), cardId, request.getMemberId());
+    return ResponseEntity.ok().body(updatedCard);
+  }
+
+  @DeleteMapping("/{cardId}/members/{memberId}")
+  public ResponseEntity<CardDetailsDto> removeMemberFromCard(
+      @PathVariable UUID cardId,
+      @PathVariable UUID memberId,
+      @RequestParam UUID boardId,
+      @AuthenticationPrincipal JwtPayload jwtPayload) {
+    CardDetailsDto updatedCard = cardService.removeMemberFromCard(jwtPayload.getId(), boardId, cardId, memberId);
+    return ResponseEntity.ok().body(updatedCard);
   }
 }

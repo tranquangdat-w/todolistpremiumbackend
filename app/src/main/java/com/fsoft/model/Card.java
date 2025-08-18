@@ -51,6 +51,9 @@ public class Card {
   @JoinColumn(name = "column_id", nullable = false)
   private Columnn column;
 
-  @OneToMany(mappedBy = "cards")
+  @OneToMany(mappedBy = "card")
   private List<CardComment> cardComments;
+
+  @OneToMany(mappedBy = "card")
+  private List<CardMember> cardMembers;
 }

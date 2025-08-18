@@ -36,6 +36,16 @@ public class CardMapper {
       cardDetailsDto.setComments(new LinkedList<>());
     }
 
+    if (card.getCardMembers() != null) {
+      cardDetailsDto.setMemberIds(
+          card.getCardMembers()
+              .stream()
+              .map(member -> member.getUser().getId())
+              .collect(Collectors.toList()));
+    } else {
+      cardDetailsDto.setMemberIds(new LinkedList<>());
+    }
+
     return cardDetailsDto;
   }
 }
