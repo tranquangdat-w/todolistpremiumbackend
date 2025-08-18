@@ -74,6 +74,9 @@ public class NotificationController {
                     .build());
         }
         invitationService.updateInvitationStatus(invitationId, status);
+        String inviterUsername = message.getInviterUsername();
+        message.setInviterUsername(message.getInvitedUsername());
+        message.setInvitedUsername(inviterUsername);
         messagingTemplate.convertAndSendToUser(
                 message.getInvitedUsername(),
                 "/queue/messages",
